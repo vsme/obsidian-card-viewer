@@ -1,0 +1,372 @@
+/* Card Viewer Plugin Styles */
+
+.card-viewer-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  padding: 0;
+  margin: 16px 0;
+  background: var(--background-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.card-viewer-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* 卡片内容布局 */
+.card-viewer-content {
+  display: flex;
+}
+
+/* 左侧海报区域 */
+.card-viewer-poster-section {
+  flex: 0 0 150px;
+  background: var(--background-secondary);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  padding: 12px;
+}
+
+/* 海报图片样式 */
+.card-viewer-poster-container {
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+}
+
+.card-viewer-poster {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-viewer-poster-placeholder {
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+  padding: 20px;
+  background: var(--background-modifier-border);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-viewer-poster-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 200px;
+  background: var(--background-secondary);
+  border: 2px dashed var(--background-modifier-border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 20px;
+}
+
+.card-viewer-error-icon {
+  font-size: 2em;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+
+.card-viewer-error-text {
+  font-size: 0.9em;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.card-viewer-debug-info {
+  font-size: 0.7em !important;
+  color: var(--text-faint) !important;
+  margin-top: 4px !important;
+  word-break: break-all;
+  max-width: 100%;
+}
+
+/* 右侧信息区域 */
+.card-viewer-info-section {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 标题和类型 */
+.card-viewer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.card-viewer-title {
+  color: var(--text-normal);
+  margin: 0;
+  font-size: 1.2em;
+  font-weight: 600;
+  line-height: 1.3;
+  flex: 1;
+}
+
+.card-viewer-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+
+
+.card-viewer-type {
+  background: var(--text-accent);
+  color: var(--text-on-accent);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.card-viewer-type-movie {
+  background: #e74c3c;
+}
+
+.card-viewer-type-tv {
+  background: #3498db;
+}
+
+.card-viewer-type-book {
+  background: #f39c12;
+}
+
+.card-viewer-type-music {
+  background: #9b59b6;
+}
+
+/* 评分和日期 */
+.card-viewer-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 0.9em;
+}
+
+.card-viewer-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-accent);
+  font-weight: 600;
+}
+
+
+
+.card-viewer-stars {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+.card-viewer-star {
+  width: 12px;
+  height: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-viewer-star svg {
+  width: 100%;
+  height: 100%;
+}
+
+.card-viewer-star.full svg path {
+  fill: #fbbf24;
+}
+
+.card-viewer-star.empty svg path {
+  fill: #d1d5db;
+}
+
+.card-viewer-rating-text {
+  font-size: 0.85em;
+  margin-left: 4px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.card-viewer-date {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* 详细信息区域 */
+.card-viewer-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-viewer-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.card-viewer-label {
+  color: var(--text-muted);
+  font-weight: 600;
+  min-width: 50px;
+  flex-shrink: 0;
+}
+
+.card-viewer-value {
+  color: var(--text-normal);
+  flex: 1;
+}
+
+.card-viewer-genres-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.card-viewer-genre-tag {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.8em;
+  font-weight: 500;
+  display: inline-block;
+  white-space: nowrap;
+  border: 1px solid var(--interactive-accent-hover);
+}
+
+/* 简介样式 */
+.card-viewer-overview {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+.card-viewer-overview-text {
+  color: var(--text-muted);
+  font-size: 0.9em;
+  line-height: 1.5;
+  margin-top: 6px;
+  max-height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* 链接样式 */
+.card-viewer-url {
+  margin-top: 12px;
+}
+
+.card-viewer-link {
+  color: var(--text-accent);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9em;
+  padding: 6px 12px;
+  background: var(--background-secondary);
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-border);
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.card-viewer-link:hover {
+  background: var(--text-accent);
+  color: var(--text-on-accent);
+  transform: translateY(-1px);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .card-viewer-content {
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  .card-viewer-poster-section {
+    flex: 0 0 200px;
+    width: 100%;
+  }
+  
+  .card-viewer-info-section {
+    padding: 12px;
+  }
+  
+  .card-viewer-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .card-viewer-type {
+    align-self: flex-start;
+  }
+  
+  .card-viewer-meta {
+    gap: 12px;
+  }
+  
+  .card-viewer-title {
+    font-size: 1.1em;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-viewer-card {
+    margin: 12px 0;
+  }
+  
+  .card-viewer-poster-section {
+    flex: 0 0 150px;
+  }
+  
+  .card-viewer-info-section {
+    padding: 10px;
+  }
+  
+  .card-viewer-detail {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .card-viewer-label {
+    min-width: auto;
+  }
+}

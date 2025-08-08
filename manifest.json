@@ -1,0 +1,10 @@
+{
+  "id": "card-viewer",
+  "name": "Card Viewer",
+  "version": "1.1.6",
+  "minAppVersion": "1.0.0",
+  "description": "Parse and view movie, TV, book, music cards in Obsidian with enhanced UI and HTML preview in reading mode. Uses card:movie format only. Fixed rendering logic for all card types.",
+  "author": "Card Viewer Plugin",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}
