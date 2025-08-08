@@ -9,6 +9,54 @@ class CardViewerPlugin extends Plugin {
       // 可以在这里添加用户通知或其他错误处理逻辑
     };
   }
+  // 从文件中查找卡片类型的逻辑
+  async findCardTypeFromFile(source, ctx) {
+    try {
+      if (ctx?.sourcePath) {
+        const fileContent = await this.app.vault.read(this.app.vault.getAbstractFileByPath(ctx.sourcePath));
+        // 提取当前卡片的ID或URL作为标识符
+        let cardIdentifier = null;
+        const idMatch = source.match(/id:\s*([^\n]+)/);
+        const urlMatch = source.match(/url:\s*([^\n]+)/);
+        if (idMatch) {
+          cardIdentifier = idMatch[1].trim();
+        } else if (urlMatch) {
+          cardIdentifier = urlMatch[1].trim();
+        }
+        if (cardIdentifier) {
+          // 在文件内容中查找包含此标识符的卡片块
+          const lines = fileContent.split('\n');
+          let foundBlockType = null;
+          let inTargetBlock = false;
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            // 检查是否是卡片块开始
+            if (line.startsWith('```card:')) {
+              const blockType = line.replace('```card:', '').trim();
+              inTargetBlock = false;
+              // 检查后续行是否包含我们的标识符
+              for (let j = i + 1; j < lines.length && !lines[j].startsWith('```'); j++) {
+                if (lines[j].includes(cardIdentifier)) {
+                  foundBlockType = blockType;
+                  inTargetBlock = true;
+                  break;
+                }
+              }
+              if (inTargetBlock) break;
+            }
+          }
+          if (foundBlockType) {
+            return foundBlockType;
+          }
+        }
+      }
+    } catch (error) {
+      // 如果读取文件失败，回退到内容推断
+    }
+    return null;
+  }
+
+
   async onload() {
     // API兼容性检查
     if (!this.app || !this.app.workspace) {
@@ -23,67 +71,7 @@ class CardViewerPlugin extends Plugin {
       // 注册通用 card 处理器
       this.registerMarkdownCodeBlockProcessor("card", async (source, el, ctx) => {
         try {
-          let cardType = "movie";
-          // 尝试从文件中根据ID或URL找到对应的卡片块类型
-          try {
-              if (ctx?.sourcePath) {
-                const fileContent = await this.app.vault.read(this.app.vault.getAbstractFileByPath(ctx.sourcePath));
-                // 提取当前卡片的ID或URL作为标识符
-                let cardIdentifier = null;
-                const idMatch = source.match(/id:\s*([^\n]+)/);
-                const urlMatch = source.match(/url:\s*([^\n]+)/);
-                if (idMatch) {
-                  cardIdentifier = idMatch[1].trim();
-                } else if (urlMatch) {
-                  cardIdentifier = urlMatch[1].trim();
-                }
-                if (cardIdentifier) {
-                  // 在文件内容中查找包含此标识符的卡片块
-                  const lines = fileContent.split('\n');
-                  let foundBlockType = null;
-                  let inTargetBlock = false;
-                  for (let i = 0; i < lines.length; i++) {
-                    const line = lines[i];
-                    // 检查是否是卡片块开始
-                    if (line.startsWith('```card:')) {
-                      const blockType = line.replace('```card:', '').trim();
-                      inTargetBlock = false;
-                      // 检查后续行是否包含我们的标识符
-                      for (let j = i + 1; j < lines.length && !lines[j].startsWith('```'); j++) {
-                        if (lines[j].includes(cardIdentifier)) {
-                          foundBlockType = blockType;
-                          inTargetBlock = true;
-                          break;
-                        }
-                      }
-                      if (inTargetBlock) break;
-                    }
-                  }
-                  if (foundBlockType) {
-                    cardType = foundBlockType;
-                  }
-                }
-              }
-            } catch (error) {
-              // 如果读取文件失败，回退到内容推断
-            }
-          // 如果无法从文件中确定类型，回退到内容推断
-          if (cardType === "movie") {
-            if (source.includes("album")) {
-              cardType = "music";
-            } else if (source.includes("author") && !source.includes("album")) {
-              cardType = "book";
-            } else if (source.includes("runtime")) {
-              cardType = "movie";
-            } else if (source.includes("release_date") && !source.includes("runtime") && !source.includes("album") && !source.includes("author")) {
-              cardType = "tv";
-            }
-          }
-          // 验证卡片类型
-          const validTypes = ["movie", "tv", "book", "music"];
-          if (!validTypes.includes(cardType)) {
-            cardType = "movie";
-          }
+          const cardType = await this.findCardTypeFromFile(source, ctx);
           await this.renderCard(cardType, source, el, ctx);
         } catch (error) {
           if (el && typeof el.createEl === "function") {
@@ -101,6 +89,39 @@ class CardViewerPlugin extends Plugin {
           el.innerHTML = source;
         } catch (error) {
           el.createEl("div", { text: `HTML渲染失败: ${error.message}` });
+        }
+      });
+    } catch (error) {
+      // 静默处理注册失败
+    }
+
+    // 注册阅读模式后处理器，通过 class 检查识别 card 代码块
+    try {
+      this.registerMarkdownPostProcessor(async (el, ctx) => {
+        try {
+          // 查找所有带有 language-card 开头的 class 的代码块（包含冒号及类型）
+          const cardCodeBlocks = el.querySelectorAll('pre > code[class*="language-card"]');
+          
+          for (const codeBlock of cardCodeBlocks) {
+            const codeContent = codeBlock.textContent || '';
+            const preElement = codeBlock.parentElement;
+            
+            // 确定卡片类型
+            const cardType = await this.findCardTypeFromFile(codeContent, ctx);
+            
+            // 创建卡片容器
+            const cardContainer = document.createElement('div');
+            
+            // 渲染卡片
+            await this.renderCard(cardType, codeContent, cardContainer, ctx);
+            
+            // 替换原始代码块
+            if (preElement && preElement.parentNode) {
+              preElement.parentNode.replaceChild(cardContainer, preElement);
+            }
+          }
+        } catch (error) {
+          // 静默处理错误
         }
       });
     } catch (error) {
