@@ -300,6 +300,8 @@ class CardViewerPlugin extends Plugin {
         const seconds = card.duration % 60;
         addDetail("时长", `${minutes}:${seconds.toString().padStart(2, '0')}`);
       }
+    } else if (card.type === "book") {
+      addDetail("作者", card.author);
     } else {
       addDetail("地区", card.region);
       if (card.runtime) addDetail("时长", `${card.runtime}分钟`);
