@@ -35,8 +35,16 @@ class CardViewerPlugin extends Plugin {
               const blockType = line.replace('```card:', '').trim();
               inTargetBlock = false;
               // 检查后续行是否包含我们的标识符
-              for (let j = i + 1; j < lines.length && !lines[j].startsWith('```'); j++) {
-                if (lines[j].includes(cardIdentifier)) {
+              for (let j = i + 1; j < lines.length; j++) {
+                // 如果遇到卡片块结束标记，停止搜索
+                if (lines[j] === '```') {
+                  break;
+                }
+                // 更精确的匹配：检查是否是完整的字段值匹配
+                const idFieldMatch = lines[j].match(/id:\s*([^\n]+)/);
+                const urlFieldMatch = lines[j].match(/url:\s*([^\n]+)/);
+                if ((idFieldMatch && idFieldMatch[1].trim() === cardIdentifier) || 
+                    (urlFieldMatch && urlFieldMatch[1].trim() === cardIdentifier)) {
                   foundBlockType = blockType;
                   inTargetBlock = true;
                   break;
@@ -148,19 +156,27 @@ class CardViewerPlugin extends Plugin {
   }
   parseCard(type, content) {
     const parseField = field => {
-      const match = content.match(new RegExp(`${field}:\\s*(.+)`, "m"));
-      return match ? match[1].trim() : undefined;
+      // 按行分割内容，然后逐行查找匹配的字段
+      const lines = content.split('\n');
+      for (const line of lines) {
+        const match = line.match(new RegExp(`^${field}:\\s*(.*)$`));
+        if (match) {
+          const value = match[1].trim();
+          return value.length > 0 ? value : undefined;
+        }
+      }
+      return undefined;
     };
     const parseNumber = field => {
       const value = parseField(field);
       return value ? parseFloat(value) : undefined;
     };
     const title = parseField("title");
-    if (!title) return null;
+    // 允许空的 title，只要有 type 就可以渲染卡片
     // 通用卡片对象，包含所有可能的字段
     return {
       type,
-      title,
+      title: title || "未命名", // 为空 title 提供默认值
       id: parseField("id") || parseNumber("id"),
       release_date: parseField("release_date"),
       region: parseField("region"),
