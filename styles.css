@@ -133,8 +133,6 @@
   flex-shrink: 0;
 }
 
-
-
 .card-viewer-type {
   background: var(--text-accent);
   color: var(--text-on-accent);
@@ -179,8 +177,6 @@
   color: var(--text-accent);
   font-weight: 600;
 }
-
-
 
 .card-viewer-stars {
   display: flex;
@@ -319,30 +315,30 @@
     flex-direction: column;
     min-height: auto;
   }
-  
+
   .card-viewer-poster-section {
     flex: 0 0 200px;
     width: 100%;
   }
-  
+
   .card-viewer-info-section {
     padding: 12px;
   }
-  
+
   .card-viewer-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
   }
-  
+
   .card-viewer-type {
     align-self: flex-start;
   }
-  
+
   .card-viewer-meta {
     gap: 12px;
   }
-  
+
   .card-viewer-title {
     font-size: 1.1em;
   }
@@ -352,20 +348,20 @@
   .card-viewer-card {
     margin: 12px 0;
   }
-  
+
   .card-viewer-poster-section {
     flex: 0 0 150px;
   }
-  
+
   .card-viewer-info-section {
     padding: 10px;
   }
-  
+
   .card-viewer-detail {
     flex-direction: column;
     gap: 4px;
   }
-  
+
   .card-viewer-label {
     min-width: auto;
   }
@@ -422,3 +418,186 @@
 .card-viewer-poster-image.hidden {
   display: none;
 }
+
+/* 图片网格样式 */
+.imgs-grid-container {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  padding: 0;
+  margin: 16px 0;
+  background: var(--background-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.imgs-grid-header {
+  background: var(--background-secondary);
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.imgs-grid-type {
+  font-size: 10px;
+  color: #888;
+  opacity: 0.6;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.imgs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 16px;
+}
+
+.imgs-grid-item {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--background-secondary);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.imgs-grid-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.imgs-grid-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.2s ease;
+}
+
+.imgs-grid-title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  color: white;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.imgs-grid-item:hover .imgs-grid-title {
+  opacity: 1;
+}
+
+.imgs-grid-error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--text-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.imgs-grid-item.error {
+  background: var(--background-modifier-error);
+}
+
+.imgs-grid-placeholder {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 40px;
+}
+
+/* 响应式设计 */
+@media (max-width: 600px) {
+  .imgs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .imgs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 模态框样式 */
+.imgs-modal {
+  display: flex;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  align-items: center;
+  justify-content: center;
+}
+
+.imgs-modal-content {
+  position: relative;
+  max-width: 90%;
+  max-height: 90%;
+  background: var(--background-primary);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.imgs-modal-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.imgs-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.imgs-modal-close:active {
+  transform: scale(0.95);
+}
+
+.imgs-modal-image {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.imgs-modal-title {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 16px;
+  color: var(--text-normal);
+  font-weight: 500;
+}
+
+```

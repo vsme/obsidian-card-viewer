@@ -13,7 +13,9 @@ class CardViewerPlugin extends Plugin {
   async findCardTypeFromFile(source, ctx) {
     try {
       if (ctx?.sourcePath) {
-        const fileContent = await this.app.vault.read(this.app.vault.getAbstractFileByPath(ctx.sourcePath));
+        const fileContent = await this.app.vault.read(
+          this.app.vault.getAbstractFileByPath(ctx.sourcePath)
+        );
         // 提取当前卡片的ID或URL作为标识符
         let cardIdentifier = null;
         const idMatch = source.match(/id:\s*([^\n]+)/);
@@ -25,26 +27,28 @@ class CardViewerPlugin extends Plugin {
         }
         if (cardIdentifier) {
           // 在文件内容中查找包含此标识符的卡片块
-          const lines = fileContent.split('\n');
+          const lines = fileContent.split("\n");
           let foundBlockType = null;
           let inTargetBlock = false;
           for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             // 检查是否是卡片块开始
-            if (line.startsWith('```card:')) {
-              const blockType = line.replace('```card:', '').trim();
+            if (line.startsWith("```card:")) {
+              const blockType = line.replace("```card:", "").trim();
               inTargetBlock = false;
               // 检查后续行是否包含我们的标识符
               for (let j = i + 1; j < lines.length; j++) {
                 // 如果遇到卡片块结束标记，停止搜索
-                if (lines[j] === '```') {
+                if (lines[j] === "```") {
                   break;
                 }
                 // 更精确的匹配：检查是否是完整的字段值匹配
                 const idFieldMatch = lines[j].match(/id:\s*([^\n]+)/);
                 const urlFieldMatch = lines[j].match(/url:\s*([^\n]+)/);
-                if ((idFieldMatch && idFieldMatch[1].trim() === cardIdentifier) || 
-                    (urlFieldMatch && urlFieldMatch[1].trim() === cardIdentifier)) {
+                if (
+                  (idFieldMatch && idFieldMatch[1].trim() === cardIdentifier) ||
+                  (urlFieldMatch && urlFieldMatch[1].trim() === cardIdentifier)
+                ) {
                   foundBlockType = blockType;
                   inTargetBlock = true;
                   break;
@@ -64,7 +68,6 @@ class CardViewerPlugin extends Plugin {
     return null;
   }
 
-
   async onload() {
     // API兼容性检查
     if (!this.app || !this.app.workspace) {
@@ -77,16 +80,21 @@ class CardViewerPlugin extends Plugin {
     // 注册代码块处理器
     try {
       // 注册通用 card 处理器
-      this.registerMarkdownCodeBlockProcessor("card", async (source, el, ctx) => {
-        try {
-          const cardType = await this.findCardTypeFromFile(source, ctx);
-          await this.renderCard(cardType, source, el, ctx);
-        } catch (error) {
-          if (el && typeof el.createEl === "function") {
-            el.createEl("div", { text: `渲染card卡片失败: ${error.message}` });
+      this.registerMarkdownCodeBlockProcessor(
+        "card",
+        async (source, el, ctx) => {
+          try {
+            const cardType = await this.findCardTypeFromFile(source, ctx);
+            await this.renderCard(cardType, source, el, ctx);
+          } catch (error) {
+            if (el && typeof el.createEl === "function") {
+              el.createEl("div", {
+                text: `渲染card卡片失败: ${error.message}`,
+              });
+            }
           }
         }
-      });
+      );
     } catch (error) {
       // 静默处理注册失败
     }
@@ -95,32 +103,43 @@ class CardViewerPlugin extends Plugin {
       this.registerMarkdownCodeBlockProcessor("html", (source, el, ctx) => {
         try {
           // 创建HTML容器
-          const htmlContainer = el.createEl("div", { cls: "html-viewer-container" });
-          
+          const htmlContainer = el.createEl("div", {
+            cls: "html-viewer-container",
+          });
+
           // 添加HTML标识
-          const headerEl = htmlContainer.createEl("div", { cls: "html-viewer-header" });
+          const headerEl = htmlContainer.createEl("div", {
+            cls: "html-viewer-header",
+          });
           headerEl.createEl("span", {
             text: "HTML",
-            cls: "html-viewer-type"
+            cls: "html-viewer-type",
           });
-          
+
           // 创建内容区域
-          const contentEl = htmlContainer.createEl("div", { cls: "html-viewer-content" });
-          
+          const contentEl = htmlContainer.createEl("div", {
+            cls: "html-viewer-content",
+          });
+
           // 检查是否为空内容
           const trimmedSource = source.trim();
           // 检查是否为空或只包含空的HTML标签
-          const isEmptyContent = trimmedSource.length === 0 || 
-            (/^\s*<\w+(?:\s+(?!style|class|id)[^=]*(?:="[^"]*")?)*>\s*<\/\w+>\s*$/.test(trimmedSource) && 
-             !/\b(?:style|class|id)\s*=/.test(trimmedSource)) ||
-            (/^\s*<\w+(?:\s+(?!style|class|id)[^=]*(?:="[^"]*")?)*\/>\s*$/.test(trimmedSource) && 
-             !/\b(?:style|class|id)\s*=/.test(trimmedSource));
-          
+          const isEmptyContent =
+            trimmedSource.length === 0 ||
+            (/^\s*<\w+(?:\s+(?!style|class|id)[^=]*(?:="[^"]*")?)*>\s*<\/\w+>\s*$/.test(
+              trimmedSource
+            ) &&
+              !/\b(?:style|class|id)\s*=/.test(trimmedSource)) ||
+            (/^\s*<\w+(?:\s+(?!style|class|id)[^=]*(?:="[^"]*")?)*\/>\s*$/.test(
+              trimmedSource
+            ) &&
+              !/\b(?:style|class|id)\s*=/.test(trimmedSource));
+
           if (isEmptyContent) {
             // 显示空内容占位符
             contentEl.createEl("div", {
               cls: "html-viewer-placeholder",
-              text: "空的HTML内容"
+              text: "空的HTML内容",
             });
           } else {
             // 渲染HTML内容
@@ -134,29 +153,53 @@ class CardViewerPlugin extends Plugin {
       // 静默处理注册失败
     }
 
-    // 注册阅读模式后处理器，通过 class 检查识别 card 代码块
+    // 注册阅读模式后处理器，通过 class 检查识别 card 和 imgs 代码块
     try {
       this.registerMarkdownPostProcessor(async (el, ctx) => {
         try {
           // 查找所有带有 language-card 开头的 class 的代码块（包含冒号及类型）
-          const cardCodeBlocks = el.querySelectorAll('pre > code[class*="language-card"]');
-          
+          const cardCodeBlocks = el.querySelectorAll(
+            'pre > code[class*="language-card"]'
+          );
+
           for (const codeBlock of cardCodeBlocks) {
-            const codeContent = codeBlock.textContent || '';
+            const codeContent = codeBlock.textContent || "";
             const preElement = codeBlock.parentElement;
-            
+
             // 确定卡片类型
             const cardType = await this.findCardTypeFromFile(codeContent, ctx);
-            
+
             // 创建卡片容器
-            const cardContainer = document.createElement('div');
-            
+            const cardContainer = document.createElement("div");
+
             // 渲染卡片
             await this.renderCard(cardType, codeContent, cardContainer, ctx);
-            
+
             // 替换原始代码块
             if (preElement && preElement.parentNode) {
               preElement.parentNode.replaceChild(cardContainer, preElement);
+            }
+          }
+
+          // 查找所有带有 language-imgs class 的代码块
+          const imgsCodeBlocks = el.querySelectorAll(
+            'pre > code[class*="language-imgs"]'
+          );
+
+          for (const codeBlock of imgsCodeBlocks) {
+            const codeContent = codeBlock.textContent || "";
+            const preElement = codeBlock.parentElement;
+
+            // 创建图片网格容器
+            const gridContainer = document.createElement("div");
+            gridContainer.className = "imgs-grid-container";
+
+            // 渲染图片网格
+            await this.renderImgsGrid(codeContent, gridContainer, ctx);
+
+            // 替换原始代码块
+            if (preElement && preElement.parentNode) {
+              preElement.parentNode.replaceChild(gridContainer, preElement);
             }
           }
         } catch (error) {
@@ -188,7 +231,7 @@ class CardViewerPlugin extends Plugin {
   parseCard(type, content) {
     const parseField = field => {
       // 按行分割内容，然后逐行查找匹配的字段
-      const lines = content.split('\n');
+      const lines = content.split("\n");
       for (const line of lines) {
         const match = line.match(new RegExp(`^${field}:\\s*(.*)$`));
         if (match) {
@@ -222,6 +265,120 @@ class CardViewerPlugin extends Plugin {
       url: parseField("url"),
     };
   }
+  async renderImgsGrid(source, el, ctx) {
+    try {
+      // 添加标识
+      const headerEl = el.appendChild(document.createElement("div"));
+      headerEl.className = "imgs-grid-header";
+      const typeEl = headerEl.appendChild(document.createElement("span"));
+      typeEl.textContent = "IMAGES";
+      typeEl.className = "imgs-grid-type";
+
+      // 创建9宫格容器
+      const gridEl = el.appendChild(document.createElement("div"));
+      gridEl.className = "imgs-grid";
+
+      // 解析图片信息
+      const imageRegex = /!\[([^\]]*)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/g;
+      const images = [];
+      let match;
+
+      while ((match = imageRegex.exec(source)) !== null) {
+        images.push({
+          alt: match[1] || "",
+          src: match[2],
+          title: match[3] || "",
+        });
+      }
+
+      if (images.length === 0) {
+        // 显示空内容占位符
+        const placeholderEl = gridEl.appendChild(document.createElement("div"));
+        placeholderEl.className = "imgs-grid-placeholder";
+        placeholderEl.textContent = "未找到图片";
+      } else {
+        // 渲染图片
+        images.forEach((image, index) => {
+          const imageItem = gridEl.appendChild(document.createElement("div"));
+          imageItem.className = "imgs-grid-item";
+
+          let imageSrc = image.src;
+          // 处理相对路径
+          if (imageSrc.startsWith("../")) {
+            // 移除开头的 ../
+            imageSrc = imageSrc.replace(/^\.\.\//, "");
+            const file = this.app.vault.getAbstractFileByPath(imageSrc);
+            if (file) {
+              try {
+                imageSrc = this.app.vault.adapter.getResourcePath(imageSrc);
+              } catch {
+                // 保持原路径
+              }
+            }
+          }
+
+          const imgEl = imageItem.appendChild(document.createElement("img"));
+          imgEl.className = "imgs-grid-image";
+          imgEl.src = imageSrc;
+          imgEl.alt = image.alt;
+          imgEl.loading = "lazy";
+
+          // 如果有标题，添加标题显示
+          if (image.title) {
+            const titleEl = imageItem.appendChild(
+              document.createElement("div")
+            );
+            titleEl.className = "imgs-grid-title";
+            titleEl.textContent = image.title;
+          }
+
+          // 图片加载错误处理
+          imgEl.onerror = () => {
+            imageItem.classList.add("error");
+            const errorEl = imageItem.appendChild(
+              document.createElement("div")
+            );
+            errorEl.className = "imgs-grid-error";
+            errorEl.textContent = "图片加载失败";
+          };
+
+          // 点击放大功能
+          imgEl.addEventListener("click", () => {
+            // 创建模态框显示大图
+            const modal = document.createElement("div");
+            modal.className = "imgs-modal";
+            modal.innerHTML = `
+              <div class="imgs-modal-content">
+                <button class="imgs-modal-close" type="button" aria-label="关闭">&times;</button>
+                <img src="${imageSrc}" alt="${image.alt}" class="imgs-modal-image">
+                ${image.title ? `<div class="imgs-modal-title">${image.title}</div>` : ""}
+              </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // 关闭模态框
+            const closeModal = () => {
+              document.body.removeChild(modal);
+            };
+
+            modal
+              .querySelector(".imgs-modal-close")
+              .addEventListener("click", closeModal);
+            modal.addEventListener("click", e => {
+              if (e.target === modal) {
+                closeModal();
+              }
+            });
+          });
+        });
+      }
+    } catch (error) {
+      const errorEl = el.appendChild(document.createElement("div"));
+      errorEl.textContent = `图片网格渲染失败: ${error.message}`;
+    }
+  }
+
   async renderCard(type, source, el, ctx) {
     if (!el || typeof el.createEl !== "function") {
       return;
@@ -242,7 +399,7 @@ class CardViewerPlugin extends Plugin {
     // 添加整个卡片的点击事件
     if (card.id || (card.type === "music" && card.url)) {
       cardEl.addClass("card-viewer-clickable");
-      cardEl.addEventListener("click", (e) => {
+      cardEl.addEventListener("click", e => {
         e.preventDefault();
         if (card.type === "music" && card.url) {
           window.open(card.url, "_blank");
@@ -265,12 +422,13 @@ class CardViewerPlugin extends Plugin {
       text: card.title,
       cls: "card-viewer-title",
     });
-    const headerRightEl = headerEl.createEl("div", { cls: "card-viewer-header-right" });
+    const headerRightEl = headerEl.createEl("div", {
+      cls: "card-viewer-header-right",
+    });
     headerRightEl.createEl("span", {
       text: card.type.toUpperCase(),
       cls: `card-viewer-type card-viewer-type-${card.type}`,
     });
-
 
     // 评分信息
     if (card.rating) {
@@ -287,16 +445,16 @@ class CardViewerPlugin extends Plugin {
           const isFull = i < Math.floor(starRating);
           const isHalf = i === Math.floor(starRating) && starRating % 1 >= 0.5;
           const starEl = starsContainer.createEl("span", {
-            cls: `card-viewer-star ${isFull ? 'full' : isHalf ? 'half' : 'empty'}`,
+            cls: `card-viewer-star ${isFull ? "full" : isHalf ? "half" : "empty"}`,
           });
           starEl.innerHTML = `<svg viewBox="0 0 20 20" fill="none"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>`;
           if (isHalf) {
             starEl.innerHTML = `<svg viewBox="0 0 20 20" fill="none"><defs><clipPath id="half-star-${i}"><rect x="0" y="0" width="10" height="20"/></clipPath></defs><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" fill="#d1d5db"/><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" fill="#fbbf24" clip-path="url(#half-star-${i})"/></svg>`;
           }
         }
-        ratingEl.createSpan({ 
-          text: card.rating.toFixed(1), 
-          cls: "card-viewer-rating-text" 
+        ratingEl.createSpan({
+          text: card.rating.toFixed(1),
+          cls: "card-viewer-rating-text",
         });
       }
     }
@@ -318,7 +476,10 @@ class CardViewerPlugin extends Plugin {
           const genresContainer = detailEl.createEl("div", {
             cls: "card-viewer-genres-container",
           });
-          const genres = value.toString().split(",").map(g => g.trim());
+          const genres = value
+            .toString()
+            .split(",")
+            .map(g => g.trim());
           genres.forEach(genre => {
             if (genre) {
               genresContainer.createEl("span", {
@@ -337,7 +498,7 @@ class CardViewerPlugin extends Plugin {
     };
     // 添加发行日期到详细信息中
     addDetail("日期", card.release_date);
-    
+
     if (card.type === "music") {
       addDetail("作者", card.author);
       addDetail("专辑", card.album);
@@ -345,7 +506,7 @@ class CardViewerPlugin extends Plugin {
       if (card.duration) {
         const minutes = Math.floor(card.duration / 60);
         const seconds = card.duration % 60;
-        addDetail("时长", `${minutes}:${seconds.toString().padStart(2, '0')}`);
+        addDetail("时长", `${minutes}:${seconds.toString().padStart(2, "0")}`);
       }
     } else if (card.type === "book") {
       addDetail("作者", card.author);
@@ -414,7 +575,6 @@ class CardViewerPlugin extends Plugin {
         cls: "card-viewer-overview-text",
       });
     }
-
   }
 }
 module.exports = CardViewerPlugin;
