@@ -94,7 +94,38 @@ class CardViewerPlugin extends Plugin {
     try {
       this.registerMarkdownCodeBlockProcessor("html", (source, el, ctx) => {
         try {
-          el.innerHTML = source;
+          // 创建HTML容器
+          const htmlContainer = el.createEl("div", { cls: "html-viewer-container" });
+          
+          // 添加HTML标识
+          const headerEl = htmlContainer.createEl("div", { cls: "html-viewer-header" });
+          headerEl.createEl("span", {
+            text: "HTML",
+            cls: "html-viewer-type"
+          });
+          
+          // 创建内容区域
+          const contentEl = htmlContainer.createEl("div", { cls: "html-viewer-content" });
+          
+          // 检查是否为空内容
+          const trimmedSource = source.trim();
+          // 检查是否为空或只包含空的HTML标签
+          const isEmptyContent = trimmedSource.length === 0 || 
+            (/^\s*<\w+(?:\s+(?!style|class|id)[^=]*(?:="[^"]*")?)*>\s*<\/\w+>\s*$/.test(trimmedSource) && 
+             !/\b(?:style|class|id)\s*=/.test(trimmedSource)) ||
+            (/^\s*<\w+(?:\s+(?!style|class|id)[^=]*(?:="[^"]*")?)*\/>\s*$/.test(trimmedSource) && 
+             !/\b(?:style|class|id)\s*=/.test(trimmedSource));
+          
+          if (isEmptyContent) {
+            // 显示空内容占位符
+            contentEl.createEl("div", {
+              cls: "html-viewer-placeholder",
+              text: "空的HTML内容"
+            });
+          } else {
+            // 渲染HTML内容
+            contentEl.innerHTML = source;
+          }
         } catch (error) {
           el.createEl("div", { text: `HTML渲染失败: ${error.message}` });
         }
@@ -210,7 +241,7 @@ class CardViewerPlugin extends Plugin {
     });
     // 添加整个卡片的点击事件
     if (card.id || (card.type === "music" && card.url)) {
-      cardEl.style.cursor = "pointer";
+      cardEl.addClass("card-viewer-clickable");
       cardEl.addEventListener("click", (e) => {
         e.preventDefault();
         if (card.type === "music" && card.url) {
@@ -340,7 +371,7 @@ class CardViewerPlugin extends Plugin {
         cls: "card-viewer-poster-container",
       });
       const posterEl = posterContainer.createEl("img", {
-        cls: "card-viewer-poster",
+        cls: "card-viewer-poster card-viewer-poster-image",
         attr: {
           src: imageSrc,
           alt: card.title || "海报图片",
@@ -348,7 +379,7 @@ class CardViewerPlugin extends Plugin {
       });
       // 图片加载处理
       posterEl.onerror = () => {
-        posterEl.style.display = "none";
+        posterEl.addClass("card-viewer-poster-image hidden");
         const errorEl = posterContainer.createEl("div", {
           cls: "card-viewer-poster-error",
         });
@@ -362,10 +393,8 @@ class CardViewerPlugin extends Plugin {
         });
       };
       posterEl.onload = () => {
-        posterEl.style.opacity = "1";
+        posterEl.addClass("loaded");
       };
-      posterEl.style.opacity = "0";
-      posterEl.style.transition = "opacity 0.3s ease";
     } else {
       // 没有图片时显示占位符
       const placeholderEl = posterSection.createEl("div", {

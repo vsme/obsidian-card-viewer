@@ -370,3 +370,55 @@
     min-width: auto;
   }
 }
+
+/* HTML Viewer Styles */
+.html-viewer-container {
+  margin: 16px 0;
+}
+
+.html-viewer-header {
+  margin-bottom: 8px;
+}
+
+.html-viewer-type {
+  font-size: 10px;
+  color: #888;
+  opacity: 0.6;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.html-viewer-content {
+  /* Content area for HTML rendering */
+}
+
+.html-viewer-placeholder {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: italic;
+  padding: 20px;
+  text-align: center;
+  background-color: var(--background-secondary);
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: 4px;
+}
+
+/* Card Viewer Interactive Styles */
+.card-viewer-clickable {
+  cursor: pointer;
+}
+
+/* Poster Image Styles */
+.card-viewer-poster-image {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-viewer-poster-image.loaded {
+  opacity: 1;
+}
+
+.card-viewer-poster-image.hidden {
+  display: none;
+}
