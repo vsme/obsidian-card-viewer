@@ -26,57 +26,63 @@
 ##### 电影卡片
 
 ````
-```card:movie
-title: 阿凡达
-id: 19995
-release_date: 2009-12-18
-region: 美国
-rating: 7.6
-runtime: 162
-genres: 动作, 冒险, 奇幻, 科幻
-overview: 在遥远的潘多拉星球上，杰克·萨利是一个身体残疾的前海军陆战队员...
-poster: /path/to/poster.jpg
+```card-movie
+id: 1356587
+title: 长安的荔枝
+release_date: 2025-07-12
+region: China
+rating: 7.5
+runtime: 122分钟
+genres: 剧情, 历史, 喜剧
+overview: 唐天宝年间，人到中年的李善德（大鹏 饰）骂骂咧咧干了很多活，抠抠搜搜花了不少钱，到头来却还是个无名小吏。然而这一切随着一次召见似乎有了转机，某天有人安排给他一个"荔枝使"的肥差，只要办成，那就是荣华富贵人生逆袭，但要是办不成……
+poster: attachment/media/movie-1356587-1754901879016.jpg
 ```
 ````
 
 ##### 电视剧卡片
 ````
-```card:tv
-title: 权力的游戏
-id: 1399
-release_date: 2011-04-17
-region: 美国
-rating: 9.3
-genres: 剧情, 动作冒险, 科幻奇幻
-overview: 七个王国的贵族家族争夺铁王座的控制权...
-poster: /path/to/poster.jpg
+```card-tv
+id: 1396-绝命毒师
+title: 绝命毒师
+release_date: 2008-01-20
+region: United States of America
+rating: 8.925
+genres: 剧情, 犯罪
+overview: 新墨西哥州的高中化学老师沃尔特·H·怀特是拮据家庭的唯一经济来源。他大半生安分守己，兢兢业业，却在50岁生日之际突然得知自己罹患肺癌晚期的噩耗，原本便不甚顺意的人生顿时雪上加霜。为了保障怀孕的妻子斯凯勒和残疾的儿子小沃特能在自己死后衣食无忧，沃尔特决意铤而走险。
+poster: attachment/media/tv-1396-1754901495923.jpg
 ```
 ````
 
 ##### 书籍卡片
 ````
-```card:book
-title: 三体
-id: book_123
-release_date: 2006-05-01
-region: 中国
-rating: 8.8
-genres: 科幻小说
-overview: 文化大革命如火如荼进行的同时，军方探寻外星文明的绝秘计划"红岸工程"取得了突破性进展...
-poster: /path/to/cover.jpg
+```card-book
+id: 37359280
+title: 人工少女
+release_date: 2025-07
+region: 马来西亚
+rating: 7.7
+genres: 科幻，魔幻
+overview: 《人工少女》是马来西亚华人作家龚万辉的首部长篇小说，讲述了在近未来，世界因为一场瘟疫而毁灭，疲惫的父亲带着他的人工女儿莉莉卡，跋涉在被雨林接管的城市废墟之中，通过一扇扇记忆之"门"，穿梭回过去，经历封藏的往事。
+poster: attachment/media/book-37359280-1754902931565.jpg
+author: 龚万辉
+publisher: 浙江文艺出版社
+isbn: 9787533980054
+external_url: https://book.douban.com/subject/37359280/
 ```
 ````
 
 ##### 音乐卡片
 ````
-```card:music
-title: 夜曲
-author: 周杰伦
-album: 十一月的萧邦
-duration: 270
-genres: 流行音乐
-poster: /path/to/album.jpg
-url: https://music.example.com/track/123
+```card-music
+id: 2106636228
+title: ENOUGH!
+author: Eternxlkz
+album: ENOUGH!
+release_date: 2023-12-14
+duration: 90
+genres: Pop
+poster: attachment/media/music-https___163cn_tv_Ial8GCT-1754901733825.jpg
+url: https://163cn.tv/Ial8GCT
 ```
 ````
 
@@ -94,28 +100,12 @@ url: https://music.example.com/track/123
 ```
 ````
 
-> **注意**：HTML 内容只在阅读模式下显示预览效果，在编辑模式下显示源代码。
-
-### 代码块渲染
-
-你也可以使用代码块来渲染卡片：
-
-````
-```card
-movie
-title: 星际穿越
-release_date: 2014-11-07
-rating: 9.3
-genres: 剧情, 科幻
-overview: 近未来的地球黄沙遍野，小麦、秋葵等基础农作物相继因枯萎病灭绝...
-```
-````
-
 ## 字段说明
 
 ### 通用字段
 
 - `title`: 标题（必填）
+- `id`: 标识符（可为数字或字符串）
 - `release_date`: 发布日期（显示在详细信息中）
 - `region`: 地区
 - `rating`: 评分（自动显示为一位小数，如 8.0）
@@ -125,16 +115,19 @@ overview: 近未来的地球黄沙遍野，小麦、秋葵等基础农作物相�
 
 ### 电影特有字段
 
-- `id`: 电影ID（数字）
-- `runtime`: 时长（分钟）
+- `runtime`: 时长（分钟，也可带单位如"122分钟"）
 
 ### 电视剧特有字段
 
-- `id`: 电视剧ID（字符串）
+（无特有字段，使用通用字段即可）
 
 ### 书籍特有字段
 
-- `id`: 书籍ID（字符串）
+- `author`: 作者
+- `publisher`: 出版社
+- `isbn`: ISBN号码
+- `pages`: 页数
+- `external_url`: 外部链接（如豆瓣链接）
 
 ### 音乐特有字段
 

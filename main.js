@@ -9,64 +9,6 @@ class CardViewerPlugin extends Plugin {
       // 可以在这里添加用户通知或其他错误处理逻辑
     };
   }
-  // 从文件中查找卡片类型的逻辑
-  async findCardTypeFromFile(source, ctx) {
-    try {
-      if (ctx?.sourcePath) {
-        const fileContent = await this.app.vault.read(
-          this.app.vault.getAbstractFileByPath(ctx.sourcePath)
-        );
-        // 提取当前卡片的ID或URL作为标识符
-        let cardIdentifier = null;
-        const idMatch = source.match(/id:\s*([^\n]+)/);
-        const urlMatch = source.match(/url:\s*([^\n]+)/);
-        if (idMatch) {
-          cardIdentifier = idMatch[1].trim();
-        } else if (urlMatch) {
-          cardIdentifier = urlMatch[1].trim();
-        }
-        if (cardIdentifier) {
-          // 在文件内容中查找包含此标识符的卡片块
-          const lines = fileContent.split("\n");
-          let foundBlockType = null;
-          let inTargetBlock = false;
-          for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            // 检查是否是卡片块开始
-            if (line.startsWith("```card:")) {
-              const blockType = line.replace("```card:", "").trim();
-              inTargetBlock = false;
-              // 检查后续行是否包含我们的标识符
-              for (let j = i + 1; j < lines.length; j++) {
-                // 如果遇到卡片块结束标记，停止搜索
-                if (lines[j] === "```") {
-                  break;
-                }
-                // 更精确的匹配：检查是否是完整的字段值匹配
-                const idFieldMatch = lines[j].match(/id:\s*([^\n]+)/);
-                const urlFieldMatch = lines[j].match(/url:\s*([^\n]+)/);
-                if (
-                  (idFieldMatch && idFieldMatch[1].trim() === cardIdentifier) ||
-                  (urlFieldMatch && urlFieldMatch[1].trim() === cardIdentifier)
-                ) {
-                  foundBlockType = blockType;
-                  inTargetBlock = true;
-                  break;
-                }
-              }
-              if (inTargetBlock) break;
-            }
-          }
-          if (foundBlockType) {
-            return foundBlockType;
-          }
-        }
-      }
-    } catch (error) {
-      // 如果读取文件失败，回退到内容推断
-    }
-    return null;
-  }
 
   async onload() {
     // API兼容性检查
@@ -77,24 +19,25 @@ class CardViewerPlugin extends Plugin {
     if (typeof this.registerMarkdownCodeBlockProcessor !== "function") {
       return;
     }
-    // 注册代码块处理器
+    // 注册特定类型的卡片处理器
     try {
-      // 注册通用 card 处理器
-      this.registerMarkdownCodeBlockProcessor(
-        "card",
-        async (source, el, ctx) => {
-          try {
-            const cardType = await this.findCardTypeFromFile(source, ctx);
-            await this.renderCard(cardType, source, el, ctx);
-          } catch (error) {
-            if (el && typeof el.createEl === "function") {
-              el.createEl("div", {
-                text: `渲染card卡片失败: ${error.message}`,
-              });
+      const cardTypes = ['movie', 'tv', 'book', 'music'];
+      cardTypes.forEach(type => {
+        this.registerMarkdownCodeBlockProcessor(
+          `card-${type}`,
+          async (source, el, ctx) => {
+            try {
+              await this.renderCard(type, source, el, ctx);
+            } catch (error) {
+              if (el && typeof el.createEl === "function") {
+                el.createEl("div", {
+                  text: `渲染${type}卡片失败: ${error.message}`,
+                });
+              }
             }
           }
-        }
-      );
+        );
+      });
     } catch (error) {
       // 静默处理注册失败
     }
@@ -157,7 +100,7 @@ class CardViewerPlugin extends Plugin {
     try {
       this.registerMarkdownPostProcessor(async (el, ctx) => {
         try {
-          // 查找所有带有 language-card 开头的 class 的代码块（包含冒号及类型）
+          // 查找所有带有 language-card 开头的 class 的代码块（包含下划线及类型）
           const cardCodeBlocks = el.querySelectorAll(
             'pre > code[class*="language-card"]'
           );
@@ -165,9 +108,17 @@ class CardViewerPlugin extends Plugin {
           for (const codeBlock of cardCodeBlocks) {
             const codeContent = codeBlock.textContent || "";
             const preElement = codeBlock.parentElement;
-
-            // 确定卡片类型
-            const cardType = await this.findCardTypeFromFile(codeContent, ctx);
+            
+            // 从class名称中提取卡片类型
+            let cardType = null;
+            const classList = codeBlock.className;
+            const cardMatch = classList.match(/language-card-([a-z]+)/);
+            if (cardMatch) {
+              cardType = cardMatch[1];
+            } else if (classList.includes('language-card')) {
+               // 跳过通用的language-card，只处理特定类型
+               continue;
+             }
 
             // 创建卡片容器
             const cardContainer = document.createElement("div");
@@ -249,7 +200,7 @@ class CardViewerPlugin extends Plugin {
     // 允许空的 title，只要有 type 就可以渲染卡片
     // 通用卡片对象，包含所有可能的字段
     return {
-      type,
+      type: type || "unknown",
       title: title || "未命名", // 为空 title 提供默认值
       id: parseField("id") || parseNumber("id"),
       release_date: parseField("release_date"),
