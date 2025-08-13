@@ -214,6 +214,8 @@ class CardViewerPlugin extends Plugin {
       album: parseField("album"),
       duration: parseNumber("duration"),
       url: parseField("url"),
+      source: parseField("source"),
+      external_url: parseField("external_url"),
     };
   }
   async renderImgsGrid(source, el, ctx) {
@@ -348,21 +350,44 @@ class CardViewerPlugin extends Plugin {
       cls: "card-viewer-info-section",
     });
     // 添加整个卡片的点击事件
-    if (card.id || (card.type === "music" && card.url)) {
+    if (card.id || (card.type === "music" && card.url) || card.external_url) {
       cardEl.addClass("card-viewer-clickable");
       cardEl.addEventListener("click", e => {
         e.preventDefault();
+        
+        // 优先使用 external_url
+        if (card.external_url) {
+          window.open(card.external_url, "_blank");
+          return;
+        }
+        
         if (card.type === "music" && card.url) {
           window.open(card.url, "_blank");
         } else if (card.id) {
           let baseUrl;
-          if (card.type === "tv") {
-            baseUrl = "https://www.themoviedb.org/tv/";
-          } else if (card.type === "book") {
-            baseUrl = "https://book.douban.com/subject/";
+          
+          // 根据 source 和 type 确定跳转链接
+          if (card.source === "douban") {
+            if (card.type === "movie") {
+              baseUrl = "https://movie.douban.com/subject/";
+            } else if (card.type === "tv") {
+              baseUrl = "https://movie.douban.com/subject/";
+            } else if (card.type === "book") {
+              baseUrl = "https://book.douban.com/subject/";
+            } else {
+              baseUrl = "https://movie.douban.com/subject/";
+            }
           } else {
-            baseUrl = "https://www.themoviedb.org/movie/";
+            // 默认使用 TMDB
+            if (card.type === "tv") {
+              baseUrl = "https://www.themoviedb.org/tv/";
+            } else if (card.type === "book") {
+              baseUrl = "https://book.douban.com/subject/";
+            } else {
+              baseUrl = "https://www.themoviedb.org/movie/";
+            }
           }
+          
           window.open(`${baseUrl}${card.id}`, "_blank");
         }
       });
