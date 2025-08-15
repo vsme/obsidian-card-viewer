@@ -1,14 +1,17 @@
 import { Plugin, Notice } from "obsidian";
-import { CardType, ErrorHandler } from './types';
+import { CardType, ErrorHandler, CardViewerSettings, DEFAULT_SETTINGS } from './types';
 import { createErrorHandler, safeExecute } from './utils/errorHandler';
 import { createCardRenderer } from './renderers/cardRenderer';
 import { createImgsRenderer } from './renderers/imgsRenderer';
+import { CardViewerSettingTab } from './settings';
 
 export default class CardViewerPlugin extends Plugin {
   private registeredEvents: any[] = [];
   private errorHandler: ErrorHandler;
   private cardRenderer: any;
   private imgsRenderer: any;
+  private htmlProcessorRegistered: boolean = false; // 跟踪HTML处理器是否已注册
+  settings: CardViewerSettings = DEFAULT_SETTINGS;
 
   constructor(app: any, manifest: any) {
     super(app, manifest);
@@ -17,6 +20,9 @@ export default class CardViewerPlugin extends Plugin {
   }
 
   async onload(): Promise<void> {
+    // 加载设置
+    await this.loadSettings();
+
     // API兼容性检查
     if (!this.app || !this.app.workspace) {
       return;
@@ -31,6 +37,9 @@ export default class CardViewerPlugin extends Plugin {
     this.cardRenderer = createCardRenderer(this.app);
     this.imgsRenderer = createImgsRenderer(this.app);
 
+    // 添加设置选项卡
+    this.addSettingTab(new CardViewerSettingTab(this.app, this));
+
     // 注册特定类型的卡片处理器
     await safeExecute(
       () => this.registerCardProcessors(),
@@ -38,7 +47,7 @@ export default class CardViewerPlugin extends Plugin {
       'registerCardProcessors'
     );
 
-    // 注册HTML代码块处理器
+    // 注册HTML代码块处理器（总是注册，但内部根据设置决定是否处理）
     await safeExecute(
       () => this.registerHtmlProcessor(),
       this.errorHandler,
@@ -56,6 +65,9 @@ export default class CardViewerPlugin extends Plugin {
   onunload(): void {
     // 清理事件监听器和引用
     try {
+      // 重置HTML处理器状态
+      this.htmlProcessorRegistered = false;
+      
       // 清理可能的DOM事件监听器
       if (this.registeredEvents) {
         this.registeredEvents.forEach(event => {
@@ -94,13 +106,32 @@ export default class CardViewerPlugin extends Plugin {
   }
 
   private registerHtmlProcessor(): void {
-    this.registerMarkdownCodeBlockProcessor("html", (source: string, el: HTMLElement, ctx: any) => {
-      try {
-        this.renderHtmlBlock(source, el);
-      } catch (error) {
-        el.createEl("div", { text: `HTML渲染失败: ${(error as Error).message}` });
-      }
-    });
+    // 只在启用时注册处理器
+    if (this.settings.enableHtmlParsing && !this.htmlProcessorRegistered) {
+      this.registerMarkdownCodeBlockProcessor("html", (source: string, el: HTMLElement, ctx: any) => {
+        try {
+          this.renderHtmlBlock(source, el);
+        } catch (error) {
+          el.createEl("div", { text: `HTML渲染失败: ${(error as Error).message}` });
+        }
+      });
+      this.htmlProcessorRegistered = true;
+    }
+  }
+
+  // 动态更新HTML处理器状态
+  public updateHtmlProcessor(): void {
+    // 注意：由于Obsidian API限制，无法动态注销已注册的处理器
+    // 当前实现需要重新加载插件才能完全生效
+    // 但我们仍然尝试注册新的处理器（如果从禁用变为启用）
+    if (this.settings.enableHtmlParsing && !this.htmlProcessorRegistered) {
+      this.registerHtmlProcessor();
+    }
+    
+    // 触发视图刷新
+    if (this.app.workspace) {
+      this.app.workspace.trigger('layout-change');
+    }
   }
 
   private renderHtmlBlock(source: string, el: HTMLElement): void {
@@ -223,5 +254,13 @@ export default class CardViewerPlugin extends Plugin {
         preElement.parentNode.replaceChild(gridContainer, preElement);
       }
     }
+  }
+
+  async loadSettings() {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+  }
+
+  async saveSettings() {
+    await this.saveData(this.settings);
   }
 }

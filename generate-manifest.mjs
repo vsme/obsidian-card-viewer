@@ -8,7 +8,7 @@ const manifestTemplate = `{
 	"id": "obsidian-card-viewer",
 	"name": "Card Viewer",
 	"version": "{{VERSION}}",
-	"minAppVersion": "1.0.0",
+	"minAppVersion": "1.6.0",
 	"description": "{{DESCRIPTION}}",
 	"author": "{{AUTHOR}}",
 	"authorUrl": "https://github.com/vsme",

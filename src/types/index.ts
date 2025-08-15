@@ -45,3 +45,11 @@ export interface CardRenderer {
 export interface ImgsRenderer {
   renderImgsGrid(source: string, el: HTMLElement, ctx: any): Promise<void>;
 }
+
+export interface CardViewerSettings {
+  enableHtmlParsing: boolean;
+}
+
+export const DEFAULT_SETTINGS: CardViewerSettings = {
+  enableHtmlParsing: true,
+};
