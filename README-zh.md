@@ -97,6 +97,10 @@ url: https://163cn.tv/Ial8GCT
 ```
 ````
 
+> **Note**: 可以在插件设置中关闭 `HTML` 内容预览功能。
+
+https://github.com/user-attachments/assets/b0057692-e6a8-45b2-b3e4-3d030ce709dd
+
 ## 字段说明
 
 ### 通用字段
@@ -134,8 +138,6 @@ url: https://163cn.tv/Ial8GCT
 - `url`: 播放链接
 
 ### HTML 内容说明
-
-> **Note**: 可以在插件设置中关闭 `HTML` 内容预览功能。
 
 - 使用标准的 ```html 代码块格式
 - 在阅读模式下自动渲染为可交互的 HTML 内容
