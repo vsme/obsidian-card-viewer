@@ -1,10 +1,14 @@
 import { App } from 'obsidian';
 import { CardData, CardRenderer } from '../types';
 import { cardParser } from '../parsers/cardParser';
-import { createSafeElement } from '../utils/errorHandler';
+import { createImagePathProcessor, ImagePathProcessor } from '../utils/imagePathProcessor';
 
 export class CardRendererImpl implements CardRenderer {
-  constructor(private app: App) {}
+  private imagePathProcessor: ImagePathProcessor;
+
+  constructor(private app: App) {
+    this.imagePathProcessor = createImagePathProcessor(app);
+  }
 
   async renderCard(type: string, source: string, el: HTMLElement, ctx: any): Promise<void> {
     if (!el || typeof el.createEl !== "function") {
@@ -167,18 +171,7 @@ export class CardRendererImpl implements CardRenderer {
 
   private renderPoster(posterSection: HTMLElement, card: CardData): void {
     if (card.poster) {
-      let imageSrc = card.poster;
-      // 简化路径处理
-      if (imageSrc.startsWith("attachment/")) {
-        const file = this.app.vault.getAbstractFileByPath(imageSrc);
-        if (file) {
-          try {
-            imageSrc = this.app.vault.adapter.getResourcePath(imageSrc);
-          } catch {
-            // 保持原路径
-          }
-        }
-      }
+      const imageSrc = this.imagePathProcessor.processImagePath(card.poster);
       
       const posterContainer = posterSection.createEl("div", {
         cls: "card-viewer-poster-container",

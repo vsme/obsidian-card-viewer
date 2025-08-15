@@ -1,8 +1,13 @@
 import { App } from 'obsidian';
 import { ImageData, ImgsRenderer } from '../types';
+import { createImagePathProcessor, ImagePathProcessor } from '../utils/imagePathProcessor';
 
 export class ImgsRendererImpl implements ImgsRenderer {
-  constructor(private app: App) {}
+  private imagePathProcessor: ImagePathProcessor;
+
+  constructor(private app: App) {
+    this.imagePathProcessor = createImagePathProcessor(app);
+  }
 
   async renderImgsGrid(source: string, el: HTMLElement, ctx: any): Promise<void> {
     try {
@@ -82,27 +87,7 @@ export class ImgsRendererImpl implements ImgsRenderer {
   }
 
   private processImageSrc(src: string): string {
-    let imageSrc = src;
-    try {
-      imageSrc = decodeURIComponent(imageSrc);
-    } catch {
-      // 如果解码失败，保持原路径
-    }
-
-    // 处理相对路径（与原始代码保持一致）
-    if (imageSrc.startsWith("../")) {
-      imageSrc = imageSrc.replace(/^\.\.\//, "");
-      const file = this.app.vault.getAbstractFileByPath(imageSrc);
-      if (file) {
-        try {
-          imageSrc = this.app.vault.adapter.getResourcePath(imageSrc);
-        } catch {
-          // 保持原路径
-        }
-      }
-    }
-    
-    return imageSrc;
+    return this.imagePathProcessor.processImagePath(src);
   }
 
   private createImageElement(container: HTMLElement, src: string, image: ImageData): HTMLElement {

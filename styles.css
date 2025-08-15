@@ -599,3 +599,43 @@
   color: var(--text-normal);
   font-weight: 500;
 }
+
+/* HTML渲染错误处理样式 */
+.html-viewer-error {
+  background: var(--background-modifier-error);
+  color: var(--text-error);
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-error-border);
+  margin: 8px 0;
+  font-family: var(--font-monospace);
+  font-size: 14px;
+}
+
+.image-load-error {
+  background: var(--background-modifier-error);
+  color: var(--text-error);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-error-border);
+  margin: 4px 0;
+  font-size: 12px;
+  text-align: center;
+  display: inline-block;
+}
+
+/* HTML内容容器增强 */
+.html-viewer-content {
+  position: relative;
+}
+
+.html-viewer-content media-player {
+  max-width: 100%;
+  height: auto;
+}
+
+.html-viewer-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
