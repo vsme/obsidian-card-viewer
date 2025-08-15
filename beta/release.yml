@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify build outputs
+        run: |
+          echo "Checking build outputs..."
+          ls -la
+          if [ ! -f "main.js" ]; then echo "Error: main.js not found"; exit 1; fi
+          if [ ! -f "manifest.json" ]; then echo "Error: manifest.json not found"; exit 1; fi
+          if [ ! -f "styles.css" ]; then echo "Warning: styles.css not found"; fi
+
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          echo "Creating release for tag: $tag"
+          
+          # Create release with main files
+          release_files="main.js manifest.json"
+          if [ -f "styles.css" ]; then
+            release_files="$release_files styles.css"
+          fi
+          
+          gh release create "$tag" \
+            --title="Release $tag" \
+            --generate-notes \
+            --draft \
+            $release_files

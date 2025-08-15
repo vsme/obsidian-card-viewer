@@ -37,8 +37,10 @@ print_error() {
 # 函数：清理临时文件
 cleanup() {
     print_info "清理临时文件..."
-    rm -rf "$BETA_REPO_DIR"
+    # 只清理构建目录，保留 beta 仓库以便下次复用
     rm -rf "$BUILD_DIR"
+    # 如果需要完全清理，取消注释下面这行
+    # rm -rf "$BETA_REPO_DIR"
 }
 
 # 函数：检查依赖
@@ -104,18 +106,42 @@ prepare_files() {
         print_warning "styles.css 不存在，跳过"
     fi
     
+    # 复制 .github/workflows 目录（如果存在）
+    if [ -f "beta/release.yml" ]; then
+        mkdir -p "$BUILD_DIR/.github/workflows"
+        cp beta/release.yml "$BUILD_DIR/.github/workflows/"
+        print_info "已复制 GitHub Actions workflow"
+    else
+        print_warning "beta/release.yml 不存在，跳过"
+    fi
+    
     print_success "文件准备完成"
     ls -la "$BUILD_DIR"
 }
 
-# 函数：克隆 beta 仓库
+# 函数：准备 beta 仓库
 clone_beta_repo() {
-    print_info "克隆 beta 仓库..."
-    
-    if [ -d "$BETA_REPO_DIR" ]; then
-        rm -rf "$BETA_REPO_DIR"
+    if [ -d "$BETA_REPO_DIR/.git" ]; then
+        print_info "beta 仓库已存在，更新仓库..."
+        cd "$BETA_REPO_DIR"
+        
+        # 检查是否是正确的仓库
+        CURRENT_URL=$(git remote get-url origin 2>/dev/null || echo "")
+        if [ "$CURRENT_URL" != "$BETA_REPO_URL" ]; then
+            print_warning "仓库 URL 不匹配，重新克隆..."
+            cd ..
+            rm -rf "$BETA_REPO_DIR"
+        else
+            # 更新仓库
+            git fetch origin
+            git reset --hard origin/main
+            cd ..
+            print_success "beta 仓库更新完成"
+            return
+        fi
     fi
     
+    print_info "克隆 beta 仓库..."
     git clone "$BETA_REPO_URL" "$BETA_REPO_DIR"
     
     if [ ! -d "$BETA_REPO_DIR" ]; then
@@ -136,29 +162,44 @@ deploy_to_beta() {
     git config user.name "Local Deploy Script" 2>/dev/null || true
     git config user.email "deploy@local" 2>/dev/null || true
     
-    # 清理现有文件（保留 .git）
-    find . -maxdepth 1 -not -name '.git' -not -name '.' -not -name '..' -exec rm -rf {} + 2>/dev/null || true
+    # 清理工作区（保留 .git，使用 git 方式）
+    git reset --hard HEAD 2>/dev/null || true
+    git clean -fd
     
-    # 复制新文件
-    cp -r "../$BUILD_DIR"/* .
+    # 复制新文件（包括隐藏文件）
+    cp -r "../$BUILD_DIR"/. .
     
-    # 添加所有文件
-    git add .
+    # 添加所有文件（包括删除的文件）
+    git add -A
+    
+    # 获取版本信息
+    VERSION=$(date +"%Y%m%d-%H%M%S")
+    TAG_VERSION=""
+    if [ -f "../manifest.json" ]; then
+        TAG_VERSION=$(grep '"version"' ../manifest.json | sed 's/.*"version":[[:space:]]*"\([^"]*\)".*/\1/')
+        if [ -n "$TAG_VERSION" ]; then
+            VERSION="$TAG_VERSION-$(date +"%Y%m%d-%H%M%S")"
+        fi
+    fi
     
     # 检查是否有变更
     if git diff --staged --quiet; then
         print_warning "没有文件变更，跳过提交"
+        # 即使没有文件变更，也要处理 tag
+        if [ -n "$TAG_VERSION" ]; then
+            print_info "检查并创建 tag: $TAG_VERSION"
+            git tag "$TAG_VERSION" 2>/dev/null || {
+                print_warning "Tag $TAG_VERSION 已存在，删除旧 tag"
+                git tag -d "$TAG_VERSION" 2>/dev/null || true
+                git push origin --delete "$TAG_VERSION" 2>/dev/null || true
+                git tag "$TAG_VERSION"
+            }
+            print_info "推送 tag: $TAG_VERSION"
+            git push origin "$TAG_VERSION"
+            print_success "Tag $TAG_VERSION 已推送"
+        fi
         cd ..
         return
-    fi
-    
-    # 获取版本信息
-    VERSION=$(date +"%Y%m%d-%H%M%S")
-    if [ -f "../package.json" ]; then
-        PKG_VERSION=$(grep '"version"' ../package.json | sed 's/.*"version": "\([^"]*\)".*/\1/')
-        if [ -n "$PKG_VERSION" ]; then
-            VERSION="v$PKG_VERSION-$(date +"%Y%m%d-%H%M%S")"
-        fi
     fi
     
     # 提交变更
@@ -168,9 +209,27 @@ deploy_to_beta() {
 - Build time: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
 - Files: README.md, main.js, manifest.json$([ -f styles.css ] && echo ", styles.css" || echo "")"
     
+    # 创建并推送 tag
+    if [ -n "$TAG_VERSION" ]; then
+        print_info "创建 tag: $TAG_VERSION"
+        git tag "$TAG_VERSION" 2>/dev/null || {
+            print_warning "Tag $TAG_VERSION 已存在，删除旧 tag"
+            git tag -d "$TAG_VERSION" 2>/dev/null || true
+            git push origin --delete "$TAG_VERSION" 2>/dev/null || true
+            git tag "$TAG_VERSION"
+        }
+    fi
+    
     # 推送到远程仓库
     print_info "推送到远程仓库..."
     git push origin main
+    
+    # 推送 tag
+    if [ -n "$TAG_VERSION" ]; then
+        print_info "推送 tag: $TAG_VERSION"
+        git push origin "$TAG_VERSION"
+        print_success "Tag $TAG_VERSION 已推送"
+    fi
     
     cd ..
     print_success "部署完成！"
@@ -186,7 +245,7 @@ main() {
     trap cleanup EXIT
     
     # 执行部署步骤
-    check_dependencies
+    # check_dependencies
     build_project
     prepare_files
     clone_beta_repo
@@ -222,11 +281,11 @@ fi
 
 if [ "$1" = "--dry-run" ]; then
     print_info "执行 dry-run 模式（仅构建，不部署）"
-    trap cleanup EXIT
     check_dependencies
     build_project
     prepare_files
     print_success "Dry-run 完成！构建文件位于: $BUILD_DIR"
+    print_info "注意：构建文件未被清理，请手动删除 $BUILD_DIR 目录"
     exit 0
 fi
 
