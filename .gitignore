@@ -1,6 +1,5 @@
 node_modules
 main.js
-manifest.json
 temp-build/
 temp-beta-repo/
 data.json

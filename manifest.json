@@ -1,0 +1,10 @@
+{
+	"id": "card-viewer",
+	"name": "Card Viewer",
+	"version": "1.0.3",
+	"minAppVersion": "1.6.0",
+	"description": "A plugin to display cards for movies, TV shows, books, and music",
+	"author": "vsme",
+	"authorUrl": "https://github.com/vsme",
+	"isDesktopOnly": false
+}
