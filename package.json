@@ -5,8 +5,7 @@
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
-    "build": "node generate-manifest.mjs && tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-    "generate-manifest": "node generate-manifest.mjs"
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production"
   },
   "keywords": [
     "obsidian",
