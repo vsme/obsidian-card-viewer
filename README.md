@@ -2,8 +2,6 @@
 
 一个用于在 Obsidian 中解析和查看电影、电视剧、书籍、音乐和 HTML 内容卡片的插件。
 
-<img src="./screenshot.png" alt="插件截图" style="max-width: 500px;" />
-
 - 🎬 支持电影、电视剧、书籍、音乐四种卡片类型
 - 🔍 解析当前文件中的所有卡片
 - 🎨 美观的卡片显示界面
@@ -13,7 +11,9 @@
 
 ## 使用方法
 
-### 配合插件使用示例视频
+![插件截图](./screenshot.png)
+
+### 配合插件使用示例
 
 https://github.com/user-attachments/assets/fab12904-d1db-41c2-83bf-fd26013910f1
 
