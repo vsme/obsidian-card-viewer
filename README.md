@@ -89,6 +89,8 @@ url: https://163cn.tv/Ial8GCT
 
 ##### HTML Content Preview
 
+> **Note**: `HTML` content preview is enabled by default. You can disable it in plugin settings.
+
 ````
 ```html
 <div style="padding: 20px; background: linear-gradient(45deg, #ff6b6b, #4ecdc4); border-radius: 10px; color: white; text-align: center;">
@@ -168,7 +170,7 @@ url: https://163cn.tv/Ial8GCT
 
 ## Notes
 
-- Cards must be written strictly according to the format
+- Cards must be written strictly according to the format, otherwise they may not display correctly
 - Image paths support both relative and absolute paths
 - Ratings should use numbers from 0-10, automatically displayed with one decimal place
 - Music duration should be input in seconds, automatically converted to minutes:seconds format when displayed
