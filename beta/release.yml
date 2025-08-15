@@ -39,5 +39,4 @@ jobs:
           gh release create "$tag" \
             --title="Release $tag" \
             --generate-notes \
-            --draft \
             $release_files
