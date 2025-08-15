@@ -53,28 +53,22 @@ export class HtmlRenderer {
      * @returns 处理后的HTML内容
      */
     private preprocessHtmlContent(html: string): string {
-        // 处理img标签的src属性
-        html = html.replace(/<img([^>]*?)src=["']([^"']*?)["']([^>]*?)>/gi, (match: string, before: string, src: string, after: string) => {
-            const processedSrc = this.imagePathProcessor.processImagePath(src);
-            return `<img${before}src="${processedSrc}"${after}>`;
-        });
-
-        // 处理media-player标签的src和poster属性
-        html = html.replace(/<media-player([^>]*?)>/gi, (match: string, attributes: string) => {
-            // 处理src属性
-            attributes = attributes.replace(/src=["']([^"']*?)["']/gi, (srcMatch: string, src: string) => {
-                const processedSrc = this.imagePathProcessor.processImagePath(src);
-                return `src="${processedSrc}"`;
-            });
-            
-            // 处理poster属性
-            attributes = attributes.replace(/poster=["']([^"']*?)["']/gi, (posterMatch: string, poster: string) => {
-                const processedPoster = this.imagePathProcessor.processImagePath(poster);
-                return `poster="${processedPoster}"`;
-            });
-            
-            return `<media-player${attributes}>`;
-        });
+        // 定义视频、图片和音频文件扩展名
+        const mediaExtensions = /\.(jpg|jpeg|png|gif|bmp|webp|svg|mp4|webm|ogg|avi|mov|wmv|flv|mkv|m4v|3gp|mp3|wav|aac|flac|m4a)$/i;
+        
+        // 通用处理：匹配所有HTML标签中的src和poster属性
+        // 使用全局替换来处理同一标签中的多个属性
+        html = html.replace(/(src|poster)=(["'])([^"']*?)\2/gi, 
+            (match: string, attrName: string, quote: string, attrValue: string) => {
+                // 检查属性值是否以媒体文件扩展名结尾
+                if (mediaExtensions.test(attrValue)) {
+                    const processedValue = this.imagePathProcessor.processImagePath(attrValue);
+                    return `${attrName}=${quote}${processedValue}${quote}`;
+                }
+                // 如果不是媒体文件，返回原始匹配
+                return match;
+            }
+        );
 
         return html;
     }
