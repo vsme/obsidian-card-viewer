@@ -1,11 +1,12 @@
 {
   "name": "card-viewer",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "A plugin to display cards for movies, TV shows, books, and music",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
-    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production"
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "version:update": "node update-version.js"
   },
   "keywords": [
     "obsidian",
