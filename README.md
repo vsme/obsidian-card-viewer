@@ -89,8 +89,6 @@ url: https://163cn.tv/Ial8GCT
 
 ##### HTML Content Preview
 
-> **Note**: `HTML` content preview is enabled by default. You can disable it in plugin settings.
-
 ````
 ```html
 <div style="padding: 20px; background: linear-gradient(45deg, #ff6b6b, #4ecdc4); border-radius: 10px; color: white; text-align: center;">
@@ -100,6 +98,11 @@ url: https://163cn.tv/Ial8GCT
 </div>
 ```
 ````
+
+> **Note**: `HTML` content preview is enabled by default. You can disable it in plugin settings.
+
+https://github.com/user-attachments/assets/b0057692-e6a8-45b2-b3e4-3d030ce709dd
+
 
 ## Field Descriptions
 
