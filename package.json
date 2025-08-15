@@ -1,13 +1,13 @@
 {
   "name": "obsidian-card-viewer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A plugin for Obsidian to display cards for movies, TV shows, books, and music",
   "main": "main.js",
   "scripts": {
     "dev": "node esbuild.config.mjs",
     "build": "node generate-manifest.mjs && tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
     "generate-manifest": "node generate-manifest.mjs"
-   },
+  },
   "keywords": [
     "obsidian",
     "plugin",
