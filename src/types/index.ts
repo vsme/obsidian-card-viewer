@@ -23,9 +23,11 @@ export interface ImageData {
   title: string;
 }
 
+import { MarkdownPostProcessorContext } from 'obsidian';
+
 export interface RenderContext {
   el: HTMLElement;
-  ctx: any;
+  ctx: MarkdownPostProcessorContext;
 }
 
 export type CardType = 'movie' | 'tv' | 'book' | 'music';
@@ -39,11 +41,11 @@ export interface CardParser {
 }
 
 export interface CardRenderer {
-  renderCard(type: string, source: string, el: HTMLElement, ctx: any): Promise<void>;
+  renderCard(type: string, source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void>;
 }
 
 export interface ImgsRenderer {
-  renderImgsGrid(source: string, el: HTMLElement, ctx: any): Promise<void>;
+  renderImgsGrid(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void>;
 }
 
 export interface CardViewerSettings {

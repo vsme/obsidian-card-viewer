@@ -551,7 +551,6 @@
   max-height: 90%;
   background: var(--background-primary);
   border-radius: 8px;
-  padding: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
@@ -638,4 +637,16 @@
   max-width: 100%;
   height: auto;
   border-radius: 4px;
+}
+
+/* Settings page styles */
+.card-viewer-settings-message {
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.card-viewer-settings-button-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }

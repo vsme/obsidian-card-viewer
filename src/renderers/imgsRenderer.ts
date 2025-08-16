@@ -1,4 +1,4 @@
-import { App } from 'obsidian';
+import { App, MarkdownPostProcessorContext } from 'obsidian';
 import { ImageData, ImgsRenderer } from '../types';
 import { createImagePathProcessor, ImagePathProcessor } from '../utils/imagePathProcessor';
 
@@ -9,7 +9,7 @@ export class ImgsRendererImpl implements ImgsRenderer {
     this.imagePathProcessor = createImagePathProcessor(app);
   }
 
-  async renderImgsGrid(source: string, el: HTMLElement, ctx: any): Promise<void> {
+  async renderImgsGrid(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
     try {
       // 添加标识
       const headerEl = el.appendChild(document.createElement("div"));
@@ -124,13 +124,32 @@ export class ImgsRendererImpl implements ImgsRenderer {
     // 创建模态框显示大图
     const modal = document.createElement("div");
     modal.className = "imgs-modal";
-    modal.innerHTML = `
-      <div class="imgs-modal-content">
-        <button class="imgs-modal-close" type="button" aria-label="关闭">&times;</button>
-        <img src="${src}" alt="${image.alt}" class="imgs-modal-image">
-        ${image.title ? `<div class="imgs-modal-title">${image.title}</div>` : ""}
-      </div>
-    `;
+    
+    const modalContent = document.createElement("div");
+    modalContent.className = "imgs-modal-content";
+    
+    const closeButton = document.createElement("button");
+    closeButton.className = "imgs-modal-close";
+    closeButton.type = "button";
+    closeButton.setAttribute("aria-label", "关闭");
+    closeButton.textContent = "×";
+    
+    const modalImage = document.createElement("img");
+    modalImage.src = src;
+    modalImage.alt = image.alt;
+    modalImage.className = "imgs-modal-image";
+    
+    modalContent.appendChild(closeButton);
+    modalContent.appendChild(modalImage);
+    
+    if (image.title) {
+      const titleDiv = document.createElement("div");
+      titleDiv.className = "imgs-modal-title";
+      titleDiv.textContent = image.title;
+      modalContent.appendChild(titleDiv);
+    }
+    
+    modal.appendChild(modalContent);
 
     document.body.appendChild(modal);
 
@@ -139,10 +158,7 @@ export class ImgsRendererImpl implements ImgsRenderer {
       document.body.removeChild(modal);
     };
 
-    const closeButton = modal.querySelector(".imgs-modal-close") as HTMLElement;
-    if (closeButton) {
-      closeButton.addEventListener("click", closeModal);
-    }
+    closeButton.addEventListener("click", closeModal);
     
     modal.addEventListener("click", (e) => {
       if (e.target === modal) {

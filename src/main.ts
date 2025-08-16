@@ -1,9 +1,9 @@
-import { Plugin, App, PluginManifest } from "obsidian";
-import { CardType, ErrorHandler, CardViewerSettings, DEFAULT_SETTINGS } from './types';
+import { Plugin, App, PluginManifest, MarkdownPostProcessorContext } from "obsidian";
+import { CardType, ErrorHandler, CardViewerSettings, DEFAULT_SETTINGS, CardRenderer, ImgsRenderer } from './types';
 import { createErrorHandler, safeExecute } from './utils/errorHandler';
 import { createCardRenderer } from './renderers/cardRenderer';
 import { createImgsRenderer } from './renderers/imgsRenderer';
-import { createHtmlRenderer } from './renderers/htmlRenderer';
+import { createHtmlRenderer, HtmlRenderer } from './renderers/htmlRenderer';
 import { CardViewerSettingTab } from './settings';
 
 /**
@@ -13,11 +13,11 @@ import { CardViewerSettingTab } from './settings';
  */
 export default class CardViewerPlugin extends Plugin {
   // 私有属性
-  private registeredEvents: any[] = [];
+  private registeredEvents: { detach(): void }[] = [];
   private errorHandler: ErrorHandler;
-  private cardRenderer: any;
-  private imgsRenderer: any;
-  private htmlRenderer: any;
+  private cardRenderer!: CardRenderer;
+  private imgsRenderer!: ImgsRenderer;
+  private htmlRenderer!: HtmlRenderer;
   private htmlProcessorRegistered: boolean = false;
   
   // 公共设置
@@ -133,11 +133,11 @@ export default class CardViewerPlugin extends Plugin {
    * 创建特定类型的卡片处理器
    */
   private createCardProcessor(type: CardType) {
-    return async (source: string, el: HTMLElement, ctx: any) => {
+    return async (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
       try {
         await this.cardRenderer.renderCard(type, source, el, ctx);
       } catch (error) {
-        this.renderError(el, `渲染${type}卡片失败`, error);
+        this.renderError(el, `渲染${type}卡片失败`, error instanceof Error ? error : new Error(String(error)));
       }
     };
   }
@@ -159,11 +159,11 @@ export default class CardViewerPlugin extends Plugin {
    * 创建HTML处理器
    */
   private createHtmlProcessor() {
-    return (source: string, el: HTMLElement, ctx: any) => {
+    return (source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
       try {
         this.renderHtmlBlock(source, el);
       } catch (error) {
-        this.renderError(el, "HTML渲染失败", error);
+          this.renderError(el, 'HTML渲染失败', error instanceof Error ? error : new Error(String(error)));
       }
     };
   }
@@ -260,7 +260,7 @@ export default class CardViewerPlugin extends Plugin {
    * 注册后处理器
    */
   private registerPostProcessor(): void {
-    this.registerMarkdownPostProcessor(async (el: HTMLElement, ctx: any) => {
+    this.registerMarkdownPostProcessor(async (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
       try {
         await Promise.all([
           this.processCardBlocks(el, ctx),
@@ -276,7 +276,7 @@ export default class CardViewerPlugin extends Plugin {
   /**
    * 处理卡片代码块
    */
-  private async processCardBlocks(el: HTMLElement, ctx: any): Promise<void> {
+  private async processCardBlocks(el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
     const cardCodeBlocks = el.querySelectorAll('pre > code[class*="language-card"]');
 
     for (const codeBlock of Array.from(cardCodeBlocks)) {
@@ -300,7 +300,7 @@ export default class CardViewerPlugin extends Plugin {
   /**
    * 处理单个卡片代码块
    */
-  private async processCardBlock(codeBlock: HTMLElement, cardType: string, ctx: any): Promise<void> {
+  private async processCardBlock(codeBlock: HTMLElement, cardType: string, ctx: MarkdownPostProcessorContext): Promise<void> {
     const codeContent = codeBlock.textContent || "";
     const preElement = codeBlock.parentElement;
     
@@ -317,7 +317,7 @@ export default class CardViewerPlugin extends Plugin {
   /**
    * 处理图片网格代码块
    */
-  private async processImgsBlocks(el: HTMLElement, ctx: any): Promise<void> {
+  private async processImgsBlocks(el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
     const imgsCodeBlocks = el.querySelectorAll('pre > code[class*="language-imgs"]');
 
     for (const codeBlock of Array.from(imgsCodeBlocks)) {
@@ -328,7 +328,7 @@ export default class CardViewerPlugin extends Plugin {
   /**
    * 处理单个图片网格代码块
    */
-  private async processImgsBlock(codeBlock: HTMLElement, ctx: any): Promise<void> {
+  private async processImgsBlock(codeBlock: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
     const codeContent = codeBlock.textContent || "";
     const preElement = codeBlock.parentElement;
     
@@ -346,7 +346,7 @@ export default class CardViewerPlugin extends Plugin {
   /**
    * 渲染错误信息
    */
-  private renderError(el: HTMLElement, message: string, error: any): void {
+  private renderError(el: HTMLElement, message: string, error: Error): void {
     if (el && typeof el.createEl === "function") {
       el.createEl("div", {
         text: `${message}: ${(error as Error).message}`,

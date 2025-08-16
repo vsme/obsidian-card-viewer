@@ -27,12 +27,12 @@ export class HtmlRenderer {
             // 预处理HTML内容
             const processedHtml = this.preprocessHtmlContent(source);
             
-            // 创建临时容器来解析HTML
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = processedHtml;
+            // 使用DOMParser安全解析HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(processedHtml, 'text/html');
             
             // 逐个添加子元素以避免阻塞
-            const children = Array.from(tempDiv.children);
+            const children = Array.from(doc.body.children);
             for (const child of children) {
                 contentEl.appendChild(child.cloneNode(true));
             }

@@ -26,16 +26,15 @@ class ConfirmModal extends Modal {
     contentEl.empty();
     
     // 添加消息文本
-    const messageEl = contentEl.createEl('p');
-    messageEl.style.marginBottom = '20px';
-    messageEl.style.lineHeight = '1.5';
+    const messageEl = contentEl.createEl('p', {
+      cls: 'card-viewer-settings-message'
+    });
     messageEl.setText(this.message);
     
     // 添加按钮容器
-    const buttonContainer = contentEl.createEl('div');
-    buttonContainer.style.display = 'flex';
-    buttonContainer.style.justifyContent = 'flex-end';
-    buttonContainer.style.gap = '10px';
+    const buttonContainer = contentEl.createEl('div', {
+      cls: 'card-viewer-settings-button-container'
+    });
     
     // 取消按钮
     const cancelButton = buttonContainer.createEl('button');
@@ -125,7 +124,8 @@ export class CardViewerSettingTab extends PluginSettingTab {
   // 重启插件
   private async restartPlugin(): Promise<void> {
     const pluginId = this.plugin.manifest.id;
-    const plugins = (this.app as any).plugins;
+    // @ts-ignore - Obsidian internal API
+    const plugins = this.app.plugins;
     
     try {
       // 禁用插件
@@ -142,8 +142,10 @@ export class CardViewerSettingTab extends PluginSettingTab {
           const reloadedPlugin = plugins.plugins[pluginId];
           if (reloadedPlugin) {
             // 打开插件设置
-            (this.app as any).setting.open();
-            (this.app as any).setting.openTabById(pluginId);
+            // @ts-ignore - Obsidian internal API
+            this.app.setting.open();
+            // @ts-ignore - Obsidian internal API
+            this.app.setting.openTabById(pluginId);
             new Notice('插件重启完成，设置页面已重新打开');
           } else {
             new Notice('插件重启完成');
