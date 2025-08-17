@@ -13,7 +13,7 @@
 
 ![插件截图](./screenshot.png)
 
-### 配合插件使用示例
+### 使用 Templater 插件示例
 
 https://github.com/user-attachments/assets/fab12904-d1db-41c2-83bf-fd26013910f1
 

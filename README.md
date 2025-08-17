@@ -15,7 +15,7 @@ A plugin for parsing and viewing movie, TV show, book, music, and HTML content c
 
 ![Plugin Screenshot](./screenshot.png)
 
-### Plugin Usage Example
+### Templater Plugin Usage Example
 
 https://github.com/user-attachments/assets/fab12904-d1db-41c2-83bf-fd26013910f1
 
