@@ -78,29 +78,6 @@ export class HtmlRenderer {
      * @param container 容器元素
      */
     private async postProcessHtmlElements(container: HTMLElement): Promise<void> {
-        // 处理media-player元素
-        const mediaPlayers = container.querySelectorAll('media-player');
-        mediaPlayers.forEach((player) => {
-            // 添加加载超时检测
-            const timeout = setTimeout(() => {
-                if (!player.hasAttribute('data-loaded')) {
-                    console.warn('Media player加载超时');
-                    this.showImageError(player as HTMLElement, '媒体加载超时');
-                }
-            }, 10000); // 10秒超时
-
-            // 监听加载完成事件
-            player.addEventListener('loadeddata', () => {
-                clearTimeout(timeout);
-                player.setAttribute('data-loaded', 'true');
-            });
-
-            player.addEventListener('error', () => {
-                clearTimeout(timeout);
-                this.showImageError(player as HTMLElement, '媒体加载失败');
-            });
-        });
-
         // 处理img元素
         const images = container.querySelectorAll('img');
         images.forEach((img) => {

@@ -244,13 +244,16 @@ export default class CardViewerPlugin extends Plugin {
    */
   private isEmptyHtmlContent(content: string): boolean {
     if (content.length === 0) return true;
+
+    // 定义媒体标签（需要排除的标签）
+    const mediaTags = 'img|video|audio|source|track|embed|object|iframe|canvas|svg|picture';
     
-    // 检查是否只包含空的HTML标签（不含样式、类或ID属性）
+    // 检查是否只包含空的HTML标签（排除媒体标签，不含样式、类或ID属性）
     const emptyTagPatterns = [
-      /^\s*<\w+(?:\s+(?!style|class|id)[^=]*(?:="[^"]*")?)*>\s*<\/\w+>\s*$/,
-      /^\s*<\w+(?:\s+(?!style|class|id)[^=]*(?:="[^"]*")?)*\/>\s*$/
+      new RegExp(`^\\s*<(?!(${mediaTags})\\b)\\w+(?:\\s+(?!style|class|id)[^=]*(?:="[^"]*")?)*>\\s*<\/(?!(${mediaTags})\\b)\\w+>\\s*$`, 'i'),
+      new RegExp(`^\\s*<(?!(${mediaTags})\\b)\\w+(?:\\s+(?!style|class|id)[^=]*(?:="[^"]*")?)*\\/>\\s*$`, 'i')
     ];
-    
+
     return emptyTagPatterns.some(pattern => 
       pattern.test(content) && !/\b(?:style|class|id)\s*=/.test(content)
     );

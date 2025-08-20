@@ -628,11 +628,6 @@
   position: relative;
 }
 
-.html-viewer-content media-player {
-  max-width: 100%;
-  height: auto;
-}
-
 .html-viewer-content img {
   max-width: 100%;
   height: auto;

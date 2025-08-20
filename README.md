@@ -2,14 +2,12 @@
 
 [中文介绍](./README-zh.md)
 
-A plugin for parsing and viewing movie, TV show, book, music, and HTML content cards in Obsidian.
+A plugin for parsing and viewing movie, TV show, book, music cards in Obsidian.
 
-- 🎬 Support for four card types: movies, TV shows, books, and music
-- 🖼️ Image code blocks preview in reading mode
-- 🔍 Parse all cards in the current file
 - 🎨 Beautiful card display interface
-- 🔗 Support click-to-jump to original file
-- 🏷️ Filter cards by type
+- 🎬 Support for four card types: movies, TV shows, books, and music  
+- 🖼️ Image code blocks preview in grid layout with lightbox support in reading mode
+- 🌐 Optional HTML code block rendering
 
 ## Usage
 
@@ -39,6 +37,7 @@ poster: attachment/media/movie-1356587-1754901879016.jpg
 ````
 
 ##### TV Show Card
+
 ````
 ```card-tv
 id: 1396-Breaking Bad
@@ -53,6 +52,7 @@ poster: attachment/media/tv-1396-1754901495923.jpg
 ````
 
 ##### Book Card
+
 ````
 ```card-book
 id: 37359280
@@ -71,6 +71,7 @@ external_url: https://book.douban.com/subject/37359280/
 ````
 
 ##### Music Card
+
 ````
 ```card-music
 id: 2106636228
@@ -148,18 +149,6 @@ https://github.com/user-attachments/assets/b0057692-e6a8-45b2-b3e4-3d030ce709dd
 - Supports full HTML syntax and CSS styles
 
 ## Card Layout Description
-
-### Display Structure
-
-1. **Title Row**: Title + Type tag
-2. **Rating Area**: Star rating + Numeric rating (one decimal place)
-3. **Detailed Information**:
-   - Date: Release date
-   - Region: Production region
-   - Duration: Runtime
-   - Type: Category tags
-
-### Special Formats
 
 - **Rating Display**: All ratings are displayed with one decimal place (e.g., 8.0, 7.7, 9.3)
 - **Music Duration**: Automatically converts from seconds to minutes:seconds format (e.g., 270 seconds → 4:30)
