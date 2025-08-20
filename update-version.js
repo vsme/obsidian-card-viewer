@@ -47,16 +47,16 @@ function updateVersion(newVersion, createTag = false) {
                 execSync(`git add .`, { stdio: 'inherit' });
                 execSync(`git commit -m "Update version to ${newVersion}"`, { stdio: 'inherit' });
                 execSync(`git tag ${newVersion}`, { stdio: 'inherit' });
-                console.log(`✓ 已创建标签 v${newVersion}`);
-                
+                console.log(`✓ 已创建标签 ${newVersion}`);
+
                 console.log('\n建议的后续步骤:');
-                console.log('git push && git push --tags');
+                console.log('./beta/deploy-beta.sh\ngit push && git push --tags');
             } catch (error) {
                 console.error('\n创建标签时出错:', error.message);
                 console.log('\n建议的后续步骤:');
                 console.log('1. git add package.json manifest.json');
                 console.log(`2. git commit -m "Update version to ${newVersion}"`);
-                console.log(`3. git tag v${newVersion}`);
+                console.log(`3. git tag ${newVersion}`);
                 console.log('4. git push && git push --tags');
             }
         } else {
