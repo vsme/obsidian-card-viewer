@@ -7,7 +7,6 @@ const { execSync } = require('child_process');
 /**
  * 更新版本号的脚本
  * 用法: node update-version.js <new_version> [--tag]
- * 例如: node update-version.js 1.0.4
  * 例如: node update-version.js 1.0.4 --tag (自动创建 git 标签)
  */
 

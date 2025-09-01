@@ -1,6 +1,6 @@
 {
   "name": "card-viewer",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A plugin to display cards for movies, TV shows, books, and music",
   "main": "main.js",
   "scripts": {
