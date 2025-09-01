@@ -156,6 +156,38 @@ https://github.com/user-attachments/assets/b0057692-e6a8-45b2-b3e4-3d030ce709dd
 
 ## Installation
 
+### BRAT (Recommended)
+
+#### Install BRAT Plugin
+
+1. Open Obsidian settings, click "Community plugins"
+2. Search for "BRAT" plugin and click "Install"
+3. Enable BRAT plugin
+4. Restart Obsidian
+
+#### Install Card Viewer Plugin via BRAT
+
+1. Open Obsidian settings, find "BRAT" settings page
+2. Click "Add Beta Plugin" button
+3. Enter the plugin's GitHub repository URL in the popup dialog:
+   ```
+   https://github.com/vsme/obsidian-card-viewer-beta
+   ```
+4. Click "Add Plugin" button
+5. BRAT will automatically download and install the plugin
+6. Enable "Card Viewer" plugin in "Community plugins" page
+7. Restart Obsidian
+
+#### Update Plugin
+
+Plugins installed via BRAT will automatically check for updates. You can also:
+
+1. View installed beta plugins list in BRAT settings page
+2. Click "Check for updates" button next to the plugin to manually check for updates
+3. If updates are available, BRAT will automatically download and install the latest version
+
+### Manual Installation
+
 1. Copy the plugin folder to the `.obsidian/plugins/` directory
 2. Enable the "Card Viewer" plugin in Obsidian settings
 3. Restart Obsidian

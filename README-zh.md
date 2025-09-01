@@ -153,6 +153,38 @@ https://github.com/user-attachments/assets/b0057692-e6a8-45b2-b3e4-3d030ce709dd
 
 ## 安装
 
+### BRAT（推荐）
+
+#### 安装 BRAT 插件
+
+1. 打开 Obsidian 设置，点击 "社区插件"
+2. 搜索 "BRAT" 插件，点击 "安装"
+3. 启用 BRAT 插件
+4. 重启 Obsidian
+
+#### 使用 BRAT 安装 Card Viewer 插件
+
+1. 打开 Obsidian 设置，找到 "BRAT" 设置页面
+2. 点击 "Add Beta Plugin" 按钮
+3. 在弹出的对话框中输入插件的 GitHub 仓库地址：
+   ```
+   https://github.com/vsme/obsidian-card-viewer-beta
+   ```
+4. 点击 "Add Plugin" 按钮
+5. BRAT 会自动下载并安装插件
+6. 在 "社区插件" 页面启用 "Card Viewer" 插件
+7. 重启 Obsidian
+
+#### 更新插件
+
+使用 BRAT 安装的插件会自动检查更新。你也可以：
+
+1. 在 BRAT 设置页面查看已安装的 beta 插件列表
+2. 点击插件旁边的 "Check for updates" 按钮手动检查更新
+3. 如果有更新，BRAT 会自动下载并安装最新版本
+
+### 手动安装
+
 1. 将插件文件夹复制到 `.obsidian/plugins/` 目录下
 2. 在 Obsidian 设置中启用 "Card Viewer" 插件
 3. 重启 Obsidian
