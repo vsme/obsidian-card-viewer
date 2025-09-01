@@ -282,8 +282,9 @@ export class CardRendererImpl implements CardRenderer {
         });
         const genres = value
           .toString()
-          .split(",")
-          .map(g => g.trim());
+          .split(/[,，]/)
+          .map(g => g.trim())
+          .filter(g => g);
         genres.forEach(genre => {
           if (genre) {
             genresContainer.createEl("span", {
