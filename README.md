@@ -2,7 +2,7 @@
 
 [中文介绍](./README-zh.md)
 
-A plugin for parsing and viewing movie, TV show, book, music cards in Obsidian.
+Display card views for movies, TV shows, books, and music, with covers and metadata.
 
 - 🎨 Beautiful card display interface
 - 🎬 Support for four card types: movies, TV shows, books, and music  
