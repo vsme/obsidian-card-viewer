@@ -1,7 +1,10 @@
-import { App, MarkdownPostProcessorContext } from 'obsidian';
-import { CardData, CardRenderer } from '../types';
-import { cardParser } from '../parsers/cardParser';
-import { createImagePathProcessor, ImagePathProcessor } from '../utils/imagePathProcessor';
+import { App, MarkdownPostProcessorContext, setIcon } from "obsidian";
+import { CardData, CardRenderer } from "../types";
+import { cardParser } from "../parsers/cardParser";
+import {
+  createImagePathProcessor,
+  ImagePathProcessor,
+} from "../utils/imagePathProcessor";
 
 export class CardRendererImpl implements CardRenderer {
   private imagePathProcessor: ImagePathProcessor;
@@ -10,7 +13,12 @@ export class CardRendererImpl implements CardRenderer {
     this.imagePathProcessor = createImagePathProcessor(app);
   }
 
-  async renderCard(type: string, source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
+  async renderCard(
+    type: string,
+    source: string,
+    el: HTMLElement,
+    ctx: MarkdownPostProcessorContext
+  ): Promise<void> {
     if (!el || typeof el.createEl !== "function") {
       return;
     }
@@ -54,13 +62,13 @@ export class CardRendererImpl implements CardRenderer {
       cardEl.addClass("card-viewer-clickable");
       cardEl.addEventListener("click", (e) => {
         e.preventDefault();
-        
+
         // 优先使用 external_url
         if (card.external_url) {
           window.open(card.external_url, "_blank");
           return;
         }
-        
+
         if (card.type === "music" && card.url) {
           window.open(card.url, "_blank");
         } else if (card.id) {
@@ -117,9 +125,9 @@ export class CardRendererImpl implements CardRenderer {
       const starsContainer = ratingEl.createEl("div", {
         cls: "card-viewer-stars",
       });
-      
+
       this.renderStars(starsContainer, card.rating);
-      
+
       ratingEl.createSpan({
         text: card.rating.toFixed(1),
         cls: "card-viewer-rating-text",
@@ -131,50 +139,12 @@ export class CardRendererImpl implements CardRenderer {
     const starRating = rating / 2; // 转换为5星制
     for (let i = 0; i < 5; i++) {
       const isFull = i < Math.floor(starRating);
-      const isHalf = i === Math.floor(starRating) && starRating % 1 >= 0.5;
       const starEl = container.createEl("span", {
-        cls: `card-viewer-star ${isFull ? "full" : isHalf ? "half" : "empty"}`,
+        cls: `card-viewer-star ${isFull ? "full" : "empty"}`,
       });
-      
-      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      svg.setAttribute("viewBox", "0 0 20 20");
-      svg.setAttribute("fill", "none");
-      
-      if (isHalf) {
-        const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
-        const clipPath = document.createElementNS("http://www.w3.org/2000/svg", "clipPath");
-        clipPath.setAttribute("id", `half-star-${i}`);
-        const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-        rect.setAttribute("x", "0");
-        rect.setAttribute("y", "0");
-        rect.setAttribute("width", "10");
-        rect.setAttribute("height", "20");
-        clipPath.appendChild(rect);
-        defs.appendChild(clipPath);
-        svg.appendChild(defs);
-        
-        const path1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path1.setAttribute("d", "M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z");
-        path1.setAttribute("fill", "#d1d5db");
-        svg.appendChild(path1);
-        
-        const path2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path2.setAttribute("d", "M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z");
-        path2.setAttribute("fill", "#fbbf24");
-        path2.setAttribute("clip-path", `url(#half-star-${i})`);
-        svg.appendChild(path2);
-      } else {
-        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        path.setAttribute("d", "M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z");
-        if (isFull) {
-          path.setAttribute("fill", "#fbbf24");
-        } else {
-          path.setAttribute("fill", "#d1d5db");
-        }
-        svg.appendChild(path);
-      }
-      
-      starEl.appendChild(svg);
+
+      // Use Obsidian's setIcon method instead of creating SVG manually
+      setIcon(starEl, "star");
     }
   }
 
@@ -193,20 +163,25 @@ export class CardRendererImpl implements CardRenderer {
       if (card.duration) {
         const minutes = Math.floor(card.duration / 60);
         const seconds = card.duration % 60;
-        this.addDetail(detailsEl, "时长", `${minutes}:${seconds.toString().padStart(2, "0")}`);
+        this.addDetail(
+          detailsEl,
+          "时长",
+          `${minutes}:${seconds.toString().padStart(2, "0")}`
+        );
       }
     } else if (card.type === "book") {
       this.addDetail(detailsEl, "作者", card.author);
     } else {
       this.addDetail(detailsEl, "地区", card.region);
-      if (card.runtime) this.addDetail(detailsEl, "时长", `${card.runtime}分钟`);
+      if (card.runtime)
+        this.addDetail(detailsEl, "时长", `${card.runtime}分钟`);
     }
   }
 
   private renderPoster(posterSection: HTMLElement, card: CardData): void {
     if (card.poster) {
       const imageSrc = this.imagePathProcessor.processImagePath(card.poster);
-      
+
       const posterContainer = posterSection.createEl("div", {
         cls: "card-viewer-poster-container",
       });
@@ -217,7 +192,7 @@ export class CardRendererImpl implements CardRenderer {
           alt: card.title || "海报图片",
         },
       });
-      
+
       // 图片加载处理
       posterEl.onerror = () => {
         posterEl.addClass("card-viewer-poster-image hidden");
@@ -233,7 +208,7 @@ export class CardRendererImpl implements CardRenderer {
           cls: "card-viewer-error-text",
         });
       };
-      
+
       posterEl.onload = () => {
         posterEl.addClass("loaded");
       };
@@ -247,12 +222,14 @@ export class CardRendererImpl implements CardRenderer {
   }
 
   private renderAdditionalInfo(infoSection: HTMLElement, card: CardData): void {
-    const detailsEl = infoSection.querySelector('.card-viewer-details') as HTMLElement;
+    const detailsEl = infoSection.querySelector(
+      ".card-viewer-details"
+    ) as HTMLElement;
     if (!detailsEl) return;
 
     // 其他详细信息
     this.addDetail(detailsEl, "类型", card.genres, "genres");
-    
+
     // 简介（不显示标题）
     if (card.overview) {
       const overviewEl = detailsEl.createEl("div", {
@@ -265,7 +242,12 @@ export class CardRendererImpl implements CardRenderer {
     }
   }
 
-  private addDetail(detailsEl: HTMLElement, label: string, value?: string | number, className: string = ""): void {
+  private addDetail(
+    detailsEl: HTMLElement,
+    label: string,
+    value?: string | number,
+    className: string = ""
+  ): void {
     if (value) {
       const detailEl = detailsEl.createEl("div", {
         cls: `card-viewer-detail ${className}`,
@@ -274,7 +256,7 @@ export class CardRendererImpl implements CardRenderer {
         text: `${label}: `,
         cls: "card-viewer-label",
       });
-      
+
       if (className === "genres") {
         // 为genres创建标签
         const genresContainer = detailEl.createEl("div", {
@@ -283,9 +265,9 @@ export class CardRendererImpl implements CardRenderer {
         const genres = value
           .toString()
           .split(/[,，]/)
-          .map(g => g.trim())
-          .filter(g => g);
-        genres.forEach(genre => {
+          .map((g) => g.trim())
+          .filter((g) => g);
+        genres.forEach((genre) => {
           if (genre) {
             genresContainer.createEl("span", {
               text: genre,

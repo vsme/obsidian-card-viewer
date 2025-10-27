@@ -197,12 +197,12 @@
   height: 100%;
 }
 
-.card-viewer-star.full svg path {
-  fill: #fbbf24;
+.card-viewer-star.full svg {
+  color: #fbbf24;
 }
 
-.card-viewer-star.empty svg path {
-  fill: #d1d5db;
+.card-viewer-star.empty svg {
+  color: #d1d5db;
 }
 
 .card-viewer-rating-text {
@@ -368,15 +368,15 @@
 }
 
 /* HTML Viewer Styles */
-.html-viewer-container {
+.card-viewer-html-container {
   margin: 16px 0;
 }
 
-.html-viewer-header {
+.card-viewer-html-header {
   margin-bottom: 8px;
 }
 
-.html-viewer-type {
+.card-viewer-html-type {
   font-size: 10px;
   color: #888;
   opacity: 0.6;
@@ -385,11 +385,12 @@
   letter-spacing: 0.5px;
 }
 
-.html-viewer-content {
-  /* Content area for HTML rendering */
+.card-viewer-html-content {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
-.html-viewer-placeholder {
+.card-viewer-html-placeholder {
   color: var(--text-muted);
   font-size: 12px;
   font-style: italic;
@@ -420,7 +421,7 @@
 }
 
 /* 图片网格样式 */
-.imgs-grid-container {
+.card-viewer-imgs-grid-container {
   border: 1px solid var(--background-modifier-border);
   border-radius: 12px;
   padding: 0;
@@ -430,7 +431,7 @@
   overflow: hidden;
 }
 
-.imgs-grid-header {
+.card-viewer-imgs-header {
   background: var(--background-secondary);
   padding: 8px 16px;
   border-bottom: 1px solid var(--background-modifier-border);
@@ -439,7 +440,7 @@
   justify-content: space-between;
 }
 
-.imgs-grid-type {
+.card-viewer-imgs-type {
   font-size: 10px;
   color: #888;
   opacity: 0.6;
@@ -448,14 +449,14 @@
   letter-spacing: 0.5px;
 }
 
-.imgs-grid {
+.card-viewer-imgs-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   padding: 16px;
 }
 
-.imgs-grid-item {
+.card-viewer-imgs-item {
   position: relative;
   aspect-ratio: 1;
   border-radius: 8px;
@@ -465,19 +466,19 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.imgs-grid-item:hover {
+.card-viewer-imgs-item:hover {
   transform: scale(1.02);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.imgs-grid-image {
+.card-viewer-imgs-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: opacity 0.2s ease;
 }
 
-.imgs-grid-title {
+.card-viewer-imgs-title {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -492,11 +493,11 @@
   transition: opacity 0.2s ease;
 }
 
-.imgs-grid-item:hover .imgs-grid-title {
+.card-viewer-imgs-item:hover .card-viewer-imgs-title {
   opacity: 1;
 }
 
-.imgs-grid-error {
+.card-viewer-imgs-error {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -506,11 +507,11 @@
   text-align: center;
 }
 
-.imgs-grid-item.error {
+.card-viewer-imgs-item.error {
   background: var(--background-modifier-error);
 }
 
-.imgs-grid-placeholder {
+.card-viewer-imgs-placeholder {
   grid-column: 1 / -1;
   text-align: center;
   color: var(--text-muted);
@@ -520,19 +521,55 @@
 
 /* 响应式设计 */
 @media (max-width: 600px) {
-  .imgs-grid {
+  .card-viewer-imgs-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 400px) {
-  .imgs-grid {
+  .card-viewer-imgs-grid {
     grid-template-columns: 1fr;
   }
 }
 
-/* 模态框样式 */
-.imgs-modal {
+/* HTML渲染错误处理样式 */
+.card-viewer-html-error {
+  background: var(--background-modifier-error);
+  color: var(--text-error);
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--background-modifier-error-border);
+  margin: 8px 0;
+  font-family: var(--font-monospace);
+  font-size: 14px;
+}
+
+.card-viewer-image-load-error {
+  background: var(--background-modifier-error);
+  color: var(--text-error);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--background-modifier-error-border);
+  margin: 4px 0;
+  font-size: 12px;
+  text-align: center;
+  display: inline-block;
+}
+
+/* HTML内容容器增强 */
+.card-viewer-html-content {
+  position: relative;
+}
+
+.card-viewer-html-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+/* Image Modal Styles */
+.card-viewer-image-modal {
   display: flex;
   position: fixed;
   z-index: 1000;
@@ -543,18 +580,13 @@
   background-color: rgba(0, 0, 0, 0.8);
   align-items: center;
   justify-content: center;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.imgs-modal-content {
-  position: relative;
-  max-width: 90%;
-  max-height: 90%;
-  background: var(--background-primary);
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-.imgs-modal-close {
+.card-viewer-modal-close {
   position: absolute;
   top: 15px;
   right: 20px;
@@ -575,63 +607,44 @@
   backdrop-filter: blur(4px);
 }
 
-.imgs-modal-close:hover {
+.card-viewer-modal-close:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: scale(1.1);
 }
 
-.imgs-modal-close:active {
+.card-viewer-modal-close:active {
   transform: scale(0.95);
 }
 
-.imgs-modal-image {
-  max-width: 100%;
+.card-viewer-modal-image {
+  max-width: 90%;
   max-height: 70vh;
+  width: auto;
+  height: auto;
   object-fit: contain;
   border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: block;
 }
 
-.imgs-modal-title {
+.card-viewer-modal-title {
   text-align: center;
   margin-top: 10px;
+  padding: 0 20px;
   font-size: 16px;
   color: var(--text-normal);
   font-weight: 500;
+  max-width: 90%;
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow: hidden;
 }
 
-/* HTML渲染错误处理样式 */
-.html-viewer-error {
-  background: var(--background-modifier-error);
-  color: var(--text-error);
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid var(--background-modifier-error-border);
-  margin: 8px 0;
-  font-family: var(--font-monospace);
-  font-size: 14px;
-}
-
-.image-load-error {
-  background: var(--background-modifier-error);
-  color: var(--text-error);
-  padding: 8px 12px;
-  border-radius: 4px;
-  border: 1px solid var(--background-modifier-error-border);
-  margin: 4px 0;
-  font-size: 12px;
-  text-align: center;
-  display: inline-block;
-}
-
-/* HTML内容容器增强 */
-.html-viewer-content {
-  position: relative;
-}
-
-.html-viewer-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
+.card-viewer-modal-error {
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 40px;
+  font-size: 1.1em;
 }
 
 /* Settings page styles */

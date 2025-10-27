@@ -1,6 +1,10 @@
-import { App, MarkdownPostProcessorContext } from 'obsidian';
-import { ImageData, ImgsRenderer } from '../types';
-import { createImagePathProcessor, ImagePathProcessor } from '../utils/imagePathProcessor';
+import { App, MarkdownPostProcessorContext } from "obsidian";
+import { ImageData, ImgsRenderer } from "../types";
+import {
+  createImagePathProcessor,
+  ImagePathProcessor,
+} from "../utils/imagePathProcessor";
+import { ImageModal } from "../modals/ImageModal";
 
 export class ImgsRendererImpl implements ImgsRenderer {
   private imagePathProcessor: ImagePathProcessor;
@@ -9,18 +13,22 @@ export class ImgsRendererImpl implements ImgsRenderer {
     this.imagePathProcessor = createImagePathProcessor(app);
   }
 
-  async renderImgsGrid(source: string, el: HTMLElement, ctx: MarkdownPostProcessorContext): Promise<void> {
+  async renderImgsGrid(
+    source: string,
+    el: HTMLElement,
+    ctx: MarkdownPostProcessorContext
+  ): Promise<void> {
     try {
       // 添加标识
       const headerEl = el.appendChild(document.createElement("div"));
-      headerEl.className = "imgs-grid-header";
+      headerEl.className = "card-viewer-imgs-header";
       const typeEl = headerEl.appendChild(document.createElement("span"));
       typeEl.textContent = "IMAGES";
-      typeEl.className = "imgs-grid-type";
+      typeEl.className = "card-viewer-imgs-type";
 
       // 创建9宫格容器
       const gridEl = el.appendChild(document.createElement("div"));
-      gridEl.className = "imgs-grid";
+      gridEl.className = "card-viewer-imgs-grid";
 
       // 解析图片信息
       const images = this.parseImages(source);
@@ -54,7 +62,7 @@ export class ImgsRendererImpl implements ImgsRenderer {
 
   private renderEmptyPlaceholder(gridEl: HTMLElement): void {
     const placeholderEl = gridEl.appendChild(document.createElement("div"));
-    placeholderEl.className = "imgs-grid-placeholder";
+    placeholderEl.className = "card-viewer-imgs-placeholder";
     placeholderEl.textContent = "未找到图片";
   }
 
@@ -67,11 +75,11 @@ export class ImgsRendererImpl implements ImgsRenderer {
 
   private createImageItem(image: ImageData, index: number): HTMLElement {
     const imageItem = document.createElement("div");
-    imageItem.className = "imgs-grid-item";
+    imageItem.className = "card-viewer-imgs-item";
 
     const imageSrc = this.processImageSrc(image.src);
     const imgEl = this.createImageElement(imageItem, imageSrc, image);
-    
+
     // 如果有标题，添加标题显示
     if (image.title) {
       this.addImageTitle(imageItem, image.title);
@@ -90,9 +98,13 @@ export class ImgsRendererImpl implements ImgsRenderer {
     return this.imagePathProcessor.processImagePath(src);
   }
 
-  private createImageElement(container: HTMLElement, src: string, image: ImageData): HTMLElement {
+  private createImageElement(
+    container: HTMLElement,
+    src: string,
+    image: ImageData
+  ): HTMLElement {
     const imgEl = container.appendChild(document.createElement("img"));
-    imgEl.className = "imgs-grid-image";
+    imgEl.className = "card-viewer-imgs-image";
     imgEl.src = src;
     imgEl.alt = image.alt;
     imgEl.loading = "lazy";
@@ -101,7 +113,7 @@ export class ImgsRendererImpl implements ImgsRenderer {
 
   private addImageTitle(container: HTMLElement, title: string): void {
     const titleEl = container.appendChild(document.createElement("div"));
-    titleEl.className = "imgs-grid-title";
+    titleEl.className = "card-viewer-imgs-title";
     titleEl.textContent = title;
   }
 
@@ -109,62 +121,24 @@ export class ImgsRendererImpl implements ImgsRenderer {
     imgEl.onerror = () => {
       container.classList.add("error");
       const errorEl = container.appendChild(document.createElement("div"));
-      errorEl.className = "imgs-grid-error";
+      errorEl.className = "card-viewer-imgs-error";
       errorEl.textContent = "图片加载失败";
     };
   }
 
-  private setupClickHandler(imgEl: HTMLElement, src: string, image: ImageData): void {
+  private setupClickHandler(
+    imgEl: HTMLElement,
+    src: string,
+    image: ImageData
+  ): void {
     imgEl.addEventListener("click", () => {
       this.showImageModal(src, image);
     });
   }
 
   private showImageModal(src: string, image: ImageData): void {
-    // 创建模态框显示大图
-    const modal = document.createElement("div");
-    modal.className = "imgs-modal";
-    
-    const modalContent = document.createElement("div");
-    modalContent.className = "imgs-modal-content";
-    
-    const closeButton = document.createElement("button");
-    closeButton.className = "imgs-modal-close";
-    closeButton.type = "button";
-    closeButton.setAttribute("aria-label", "关闭");
-    closeButton.textContent = "×";
-    
-    const modalImage = document.createElement("img");
-    modalImage.src = src;
-    modalImage.alt = image.alt;
-    modalImage.className = "imgs-modal-image";
-    
-    modalContent.appendChild(closeButton);
-    modalContent.appendChild(modalImage);
-    
-    if (image.title) {
-      const titleDiv = document.createElement("div");
-      titleDiv.className = "imgs-modal-title";
-      titleDiv.textContent = image.title;
-      modalContent.appendChild(titleDiv);
-    }
-    
-    modal.appendChild(modalContent);
-
-    document.body.appendChild(modal);
-
-    // 关闭模态框
-    const closeModal = () => {
-      document.body.removeChild(modal);
-    };
-
-    closeButton.addEventListener("click", closeModal);
-    
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        closeModal();
-      }
-    });
+    const modal = new ImageModal(this.app, src, image);
+    modal.open();
   }
 }
 
