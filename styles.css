@@ -627,6 +627,10 @@
   display: block;
 }
 
+.card-viewer-modal-image-hidden {
+  display: none;
+}
+
 .card-viewer-modal-title {
   text-align: center;
   margin-top: 10px;

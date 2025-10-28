@@ -50,7 +50,7 @@ export class ImageModal extends Modal {
 
     // Handle image load errors
     modalImage.addEventListener("error", () => {
-      modalImage.style.display = "none";
+      modalImage.addClass("card-viewer-modal-image-hidden");
       contentEl.createEl("div", {
         cls: "card-viewer-modal-error",
         text: "Failed to load image",
