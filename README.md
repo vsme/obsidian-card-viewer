@@ -1,7 +1,4 @@
-![GitHub manifest version](https://img.shields.io/github/manifest-json/v/vsme/obsidian-card-viewer)
-[![README](https://img.shields.io/badge/README-中文-brightgreen.svg)](./README-zh.md)
-
-## Screenshot
+![GitHub manifest version](https://img.shields.io/github/manifest-json/v/vsme/obsidian-card-viewer) [![README](https://img.shields.io/badge/README-中文-brightgreen.svg)](./README-zh.md)
 
 ![Plugin Screenshot](./screenshot.png)
 
