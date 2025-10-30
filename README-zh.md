@@ -1,4 +1,9 @@
-# Card Viewer Plugin
+![GitHub manifest version](https://img.shields.io/github/manifest-json/v/vsme/obsidian-card-viewer)
+[![README](https://img.shields.io/badge/README-中文-brightgreen.svg)](./README-zh.md)
+
+## 截图
+
+![Plugin Screenshot](./screenshot.png)
 
 一个用于在 Obsidian 中解析和查看电影、电视剧、书籍、音乐卡片的插件。
 
@@ -8,8 +13,6 @@
 - 🌐 HTML 代码块可选择是否进行渲染
 
 ## 使用方法
-
-![插件截图](./screenshot.png)
 
 ### 使用 Templater 插件示例
 
@@ -153,35 +156,7 @@ https://github.com/user-attachments/assets/b0057692-e6a8-45b2-b3e4-3d030ce709dd
 
 ## 安装
 
-### BRAT（推荐）
-
-#### 安装 BRAT 插件
-
-1. 打开 Obsidian 设置，点击 "社区插件"
-2. 搜索 "BRAT" 插件，点击 "安装"
-3. 启用 BRAT 插件
-4. 重启 Obsidian
-
-#### 使用 BRAT 安装 Card Viewer 插件
-
-1. 打开 Obsidian 设置，找到 "BRAT" 设置页面
-2. 点击 "Add Beta Plugin" 按钮
-3. 在弹出的对话框中输入插件的 GitHub 仓库地址：
-   ```
-   https://github.com/vsme/obsidian-card-viewer-beta
-   ```
-4. 点击 "Add Plugin" 按钮
-5. BRAT 会自动下载并安装插件
-6. 在 "社区插件" 页面启用 "Card Viewer" 插件
-7. 重启 Obsidian
-
-#### 更新插件
-
-使用 BRAT 安装的插件会自动检查更新。你也可以：
-
-1. 在 BRAT 设置页面查看已安装的 beta 插件列表
-2. 点击插件旁边的 "Check for updates" 按钮手动检查更新
-3. 如果有更新，BRAT 会自动下载并安装最新版本
+打开社区插件市场，搜索 "Card Viewer"，点击 "安装" 按钮。
 
 ### 手动安装
 
