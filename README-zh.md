@@ -1,6 +1,6 @@
-![GitHub manifest version](https://img.shields.io/github/manifest-json/v/vsme/obsidian-card-viewer) [![README](https://img.shields.io/badge/README-EN-brightgreen.svg)](./README.md)
-
 ![Plugin Screenshot](./screenshot.png)
+
+[![README](https://img.shields.io/badge/README-EN-brightgreen.svg)](./README.md)
 
 一个用于在 Obsidian 中解析和查看电影、电视剧、书籍、音乐卡片的插件。
 
