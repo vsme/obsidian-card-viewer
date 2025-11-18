@@ -92,6 +92,7 @@ export class CardViewerSettingTab extends PluginSettingTab {
             
             if (confirmed) {
               this.plugin.settings.enableHtmlParsing = value;
+              this.plugin.settings.requireHtmlPreviewMarker = false;
               await this.plugin.saveSettings();
               new Notice('HTML解析已禁用，正在重启插件...');
               // 重启插件
@@ -109,8 +110,34 @@ export class CardViewerSettingTab extends PluginSettingTab {
             if (value) {
               new Notice('HTML解析已启用');
             }
+            // 刷新设置面板，使依赖项显示/隐藏
+            this.display();
           }
         }));
+
+    // 仅当启用 HTML 解析时才显示预览标记控制开关
+    if (this.plugin.settings.enableHtmlParsing) {
+      new Setting(containerEl)
+        .setName('使用预览标记精确控制 HTML 渲染')
+        .setDesc('启用后，仅当 ```html 代码块开头包含 <!-- html-preview -->（允许空行/空白）时才渲染；否则保持原始代码显示。')
+        .addToggle(toggle => toggle
+          .setValue(this.plugin.settings.requireHtmlPreviewMarker)
+          .onChange(async (value) => {
+            if (value && !this.plugin.settings.requireHtmlPreviewMarker) {
+              this.plugin.settings.requireHtmlPreviewMarker = true;
+              await this.plugin.saveSettings();
+              new Notice('HTML 预览标记控制已启用，正在重启插件...');
+              await this.restartPlugin();
+            } else if (!value && this.plugin.settings.requireHtmlPreviewMarker) {
+              // 禁用预览标记控制可即时生效
+              this.plugin.settings.requireHtmlPreviewMarker = false;
+              await this.plugin.saveSettings();
+              new Notice('已禁用 HTML 预览标记控制');
+              await this.restartPlugin();
+            }
+          })
+        );
+    }
   }
 
   // 显示确认对话框

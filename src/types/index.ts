@@ -50,8 +50,10 @@ export interface ImgsRenderer {
 
 export interface CardViewerSettings {
   enableHtmlParsing: boolean;
+  requireHtmlPreviewMarker: boolean;
 }
 
 export const DEFAULT_SETTINGS: CardViewerSettings = {
   enableHtmlParsing: true,
+  requireHtmlPreviewMarker: false,
 };

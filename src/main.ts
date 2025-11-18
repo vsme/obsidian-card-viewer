@@ -157,6 +157,18 @@ export default class CardViewerPlugin extends Plugin {
       ctx: MarkdownPostProcessorContext
     ) => {
       try {
+        // 如果启用了预览标记控制，则仅当内容以 <!-- html-preview --> 开头时渲染
+        if (this.settings.requireHtmlPreviewMarker) {
+          const contentAfterMarker = this.extractPreviewHtmlContent(source);
+          if (contentAfterMarker === null) {
+            this.renderOriginalCodeBlock(source, el);
+            return;
+          }
+          this.renderHtmlBlock(contentAfterMarker, el);
+          return;
+        }
+
+        // 未启用控制时，直接渲染
         this.renderHtmlBlock(source, el);
       } catch (error) {
         this.renderError(
@@ -198,6 +210,30 @@ export default class CardViewerPlugin extends Plugin {
     } else {
       this.htmlRenderer.renderHtml(contentEl, trimmedSource);
     }
+  }
+
+  /**
+   * 当未满足预览标记要求时，保留原始代码块显示
+   */
+  private renderOriginalCodeBlock(source: string, el: HTMLElement): void {
+    const htmlContainer = this.createHtmlContainer(el);
+    const contentEl = this.createContentArea(htmlContainer);
+    const pre = contentEl.createEl("pre");
+    pre.addClass("card-viewer-original-code");
+    pre.createEl("code", { cls: "language-html", text: source });
+  }
+
+  /**
+   * 提取以预览标记开头的HTML内容
+   * 要求：代码块开头（允许空行/空白）必须是 <!-- html-preview -->
+   * 返回标记后的剩余内容；不匹配则返回 null
+   */
+  private extractPreviewHtmlContent(source: string): string | null {
+    const match = source.match(/^\s*<!--\s*html-preview\s*-->(?:[\r\n\s]*)[\s\S]*$/);
+    if (!match) return null;
+    // 再次匹配并提取标记后的剩余内容
+    const extract = source.replace(/^\s*<!--\s*html-preview\s*-->(?:[\r\n\s]*)/, "");
+    return extract;
   }
 
   /**
