@@ -12,6 +12,7 @@ export class ImagePathProcessor {
    * @returns 处理后的资源URL或原路径
    * 
    * 支持的路径格式：
+   * - `[[image.jpg]]` - Wiki link 格式
    * - `./path/to/image.jpg` - 相对路径，从当前目录开始查找
    * - `../path/to/image.jpg` - 相对路径，从上级目录开始查找
    * - `folder/image.jpg` - 相对路径，从 vault 根目录查找
@@ -30,6 +31,13 @@ export class ImagePathProcessor {
       processedPath = decodeURIComponent(processedPath);
     } catch {
       // 如果解码失败，保持原路径
+    }
+
+    // 处理 wiki link 格式: [[image.png]]
+    const wikiLinkMatch = processedPath.match(/^\[\[([^\]]+)]]$/);
+    if (wikiLinkMatch) {
+      const linkPath = wikiLinkMatch[1];
+      return this.resolveWikiLink(linkPath) || imagePath;
     }
 
     // 处理以 ./ 开头的相对路径
@@ -63,6 +71,30 @@ export class ImagePathProcessor {
     // 其他情况：绝对路径或 URL，直接返回
     // 包括：//absolute/path、http://、https://、data:、blob:、file: 等
     return processedPath;
+  }
+
+  /**
+   * 解析 wiki link 到实际文件路径
+   * @param linkPath wiki link 中的路径（不含 [[ ]]）
+   * @returns 资源URL或null
+   */
+  private resolveWikiLink(linkPath: string): string | null {
+    try {
+      // 去除可能的别名部分，如 [[image.png|别名]] → image.png
+      const pathPart = linkPath.split("|")[0].trim();
+
+      // 使用 metadataCache 解析 wiki link
+      const file = this.app.metadataCache.getFirstLinkpathDest(pathPart, "");
+      if (file instanceof TFile) {
+        return this.app.vault.getResourcePath(file);
+      }
+
+      // 如果 metadataCache 未找到，尝试直接作为 vault 路径查找
+      return this.getVaultResourcePath(pathPart);
+    } catch (error) {
+      console.warn(`Failed to resolve wiki link: ${linkPath}`, error);
+    }
+    return null;
   }
 
   /**
