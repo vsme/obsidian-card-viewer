@@ -39,7 +39,7 @@ export class CardRendererImpl implements CardRenderer {
     });
 
     // 添加整个卡片的点击事件
-    this.addCardClickHandler(cardEl, card);
+    this.addCardClickHandler(cardEl, card, ctx);
 
     // 渲染卡片头部
     this.renderCardHeader(infoSection, card);
@@ -57,7 +57,7 @@ export class CardRendererImpl implements CardRenderer {
     this.renderAdditionalInfo(infoSection, card);
   }
 
-  private addCardClickHandler(cardEl: HTMLElement, card: CardData): void {
+  private addCardClickHandler(cardEl: HTMLElement, card: CardData, ctx: MarkdownPostProcessorContext): void {
     if (card.id || (card.type === "music" && card.url) || card.external_url) {
       cardEl.addClass("card-viewer-clickable");
       cardEl.addEventListener("click", (e) => {
@@ -65,7 +65,7 @@ export class CardRendererImpl implements CardRenderer {
 
         // 优先使用 external_url
         if (card.external_url) {
-          window.open(card.external_url, "_blank");
+          this.openExternalUrl(card.external_url, ctx.sourcePath);
           return;
         }
 
@@ -77,6 +77,18 @@ export class CardRendererImpl implements CardRenderer {
         }
       });
     }
+  }
+
+  private openExternalUrl(url: string, sourcePath: string): void {
+    // 处理 wiki link 格式: [[note]] 或 [[note|alias]]
+    const wikiLinkMatch = url.match(/^\[\[([^\]]+)]]$/);
+    if (wikiLinkMatch) {
+      const linkPath = wikiLinkMatch[1].split("|")[0].trim();
+      this.app.workspace.openLinkText(linkPath, sourcePath, "tab");
+      return;
+    }
+    // 外部 URL 在新标签页打开
+    window.open(url, "_blank");
   }
 
   private getBaseUrl(card: CardData): string {
