@@ -3,3 +3,4 @@ main.js
 temp-build/
 temp-beta-repo/
 data.json
+.DS_Store

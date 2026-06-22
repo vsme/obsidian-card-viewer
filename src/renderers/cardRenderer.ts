@@ -1,4 +1,4 @@
-import { App, MarkdownPostProcessorContext, setIcon } from "obsidian";
+import { App, MarkdownPostProcessorContext, setIcon, Keymap } from "obsidian";
 import { CardData, CardRenderer } from "../types";
 import { cardParser } from "../parsers/cardParser";
 import {
@@ -39,7 +39,7 @@ export class CardRendererImpl implements CardRenderer {
     });
 
     // 添加整个卡片的点击事件
-    this.addCardClickHandler(cardEl, card);
+    this.addCardClickHandler(cardEl, card, ctx.sourcePath);
 
     // 渲染卡片头部
     this.renderCardHeader(infoSection, card);
@@ -57,7 +57,7 @@ export class CardRendererImpl implements CardRenderer {
     this.renderAdditionalInfo(infoSection, card);
   }
 
-  private addCardClickHandler(cardEl: HTMLElement, card: CardData): void {
+  private addCardClickHandler(cardEl: HTMLElement, card: CardData, sourcePath: string): void {
     if (card.id || (card.type === "music" && card.url) || card.external_url) {
       cardEl.addClass("card-viewer-clickable");
       cardEl.addEventListener("click", (e) => {
@@ -65,7 +65,15 @@ export class CardRendererImpl implements CardRenderer {
 
         // 优先使用 external_url
         if (card.external_url) {
-          window.open(card.external_url, "_blank");
+          // 检查是否包含明确的协议头（如 http://, https://, obsidian://, file:// 等）
+          if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(card.external_url)) {
+            window.open(card.external_url, "_blank");
+          } else {
+            // 如果是内部链接（如相对路径或 wiki 链接），使用 Obsidian 的打开方式
+            // 根据是否按下了 Ctrl/Cmd 等修饰键，决定是在当前页签打开还是新页签打开
+            const newLeaf = Keymap.isModEvent(e);
+            this.app.workspace.openLinkText(card.external_url, sourcePath, newLeaf);
+          }
           return;
         }
 
