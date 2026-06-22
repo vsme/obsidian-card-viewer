@@ -86,7 +86,8 @@ export class CardViewerSettingTab extends PluginSettingTab {
           if (value === "empty" || value === "title") {
             this.plugin.settings.posterAltMode = value;
             await this.plugin.saveSettings();
-            this.app.workspace?.trigger("layout-change");
+            new Notice('海报图片 Alt 文本模式已更新，正在重启插件...');
+            await this.restartPlugin();
           }
         }));
 
