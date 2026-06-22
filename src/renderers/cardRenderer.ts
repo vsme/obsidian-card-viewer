@@ -9,7 +9,7 @@ import {
 export class CardRendererImpl implements CardRenderer {
   private imagePathProcessor: ImagePathProcessor;
 
-  constructor(private app: App) {
+  constructor(private app: App, private getSettings: () => { posterAltMode: "empty" | "title" }) {
     this.imagePathProcessor = createImagePathProcessor(app);
   }
 
@@ -181,6 +181,8 @@ export class CardRendererImpl implements CardRenderer {
   private renderPoster(posterSection: HTMLElement, card: CardData): void {
     if (card.poster) {
       const imageSrc = this.imagePathProcessor.processImagePath(card.poster);
+      const settings = this.getSettings();
+      const altText = settings.posterAltMode === "empty" ? "" : (card.title || "海报图片");
 
       const posterContainer = posterSection.createEl("div", {
         cls: "card-viewer-poster-container",
@@ -189,7 +191,7 @@ export class CardRendererImpl implements CardRenderer {
         cls: "card-viewer-poster card-viewer-poster-image",
         attr: {
           src: imageSrc,
-          alt: card.title || "海报图片",
+          alt: altText,
         },
       });
 
@@ -285,6 +287,6 @@ export class CardRendererImpl implements CardRenderer {
   }
 }
 
-export const createCardRenderer = (app: App): CardRenderer => {
-  return new CardRendererImpl(app);
+export const createCardRenderer = (app: App, getSettings: () => { posterAltMode: "empty" | "title" }): CardRenderer => {
+  return new CardRendererImpl(app, getSettings);
 };

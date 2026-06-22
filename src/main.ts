@@ -72,7 +72,7 @@ export default class CardViewerPlugin extends Plugin {
    * 初始化所有渲染器
    */
   private initializeRenderers(): void {
-    this.cardRenderer = createCardRenderer(this.app);
+    this.cardRenderer = createCardRenderer(this.app, () => this.settings);
     this.imgsRenderer = createImgsRenderer(this.app);
     this.htmlRenderer = createHtmlRenderer(this.app);
   }

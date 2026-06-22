@@ -51,9 +51,11 @@ export interface ImgsRenderer {
 export interface CardViewerSettings {
   enableHtmlParsing: boolean;
   requireHtmlPreviewMarker: boolean;
+  posterAltMode: "empty" | "title";
 }
 
 export const DEFAULT_SETTINGS: CardViewerSettings = {
   enableHtmlParsing: true,
   requireHtmlPreviewMarker: false,
+  posterAltMode: "title",
 };

@@ -76,6 +76,21 @@ export class CardViewerSettingTab extends PluginSettingTab {
     containerEl.createEl('h2', { text: 'Card Viewer 设置' });
 
     new Setting(containerEl)
+      .setName('海报图片 Alt 文本模式')
+      .setDesc('选择海报图片的 alt 属性内容模式。选择"空"可以解决部分主题下未加载时的边框问题。')
+      .addDropdown(dropdown => dropdown
+        .addOption('empty', '空 (empty)')
+        .addOption('title', '卡片标题 (title)')
+        .setValue(this.plugin.settings.posterAltMode || 'title')
+        .onChange(async (value: string) => {
+          if (value === "empty" || value === "title") {
+            this.plugin.settings.posterAltMode = value;
+            await this.plugin.saveSettings();
+            this.app.workspace?.trigger("layout-change");
+          }
+        }));
+
+    new Setting(containerEl)
       .setName('启用 HTML 解析')
       .setDesc('是否启用 HTML 代码块的解析和渲染功能')
       .addToggle(toggle => toggle
