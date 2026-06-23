@@ -51,7 +51,7 @@ export class CardRendererImpl implements CardRenderer {
     this.renderDetails(infoSection, card);
 
     // 渲染海报
-    this.renderPoster(posterSection, card);
+    this.renderPoster(posterSection, card, ctx.sourcePath);
 
     // 渲染其他信息
     this.renderAdditionalInfo(infoSection, card);
@@ -186,9 +186,9 @@ export class CardRendererImpl implements CardRenderer {
     }
   }
 
-  private renderPoster(posterSection: HTMLElement, card: CardData): void {
+  private renderPoster(posterSection: HTMLElement, card: CardData, sourcePath: string): void {
     if (card.poster) {
-      const imageSrc = this.imagePathProcessor.processImagePath(card.poster);
+      const imageSrc = this.imagePathProcessor.processImagePath(card.poster, sourcePath);
       const settings = this.getSettings();
       const altText = settings.posterAltMode === "empty" ? "" : (card.title || "海报图片");
 
