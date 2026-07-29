@@ -19,8 +19,13 @@ export class HtmlRenderer {
    * 安全地渲染HTML内容到指定容器
    * @param contentEl 目标容器元素
    * @param source HTML源代码
+   * @param sourcePath 当前笔记路径，用于解析相对媒体路径
    */
-  async renderHtml(contentEl: HTMLElement, source: string): Promise<void> {
+  async renderHtml(
+    contentEl: HTMLElement,
+    source: string,
+    sourcePath: string = ""
+  ): Promise<void> {
     try {
       // 清空容器
       contentEl.empty();
@@ -29,7 +34,7 @@ export class HtmlRenderer {
       contentEl.addClass("card-viewer-html-content");
 
       // 预处理HTML内容
-      const processedHtml = this.preprocessHtmlContent(source);
+      const processedHtml = this.preprocessHtmlContent(source, sourcePath);
 
       // 使用DOMParser安全解析HTML
       const parser = new DOMParser();
@@ -54,12 +59,13 @@ export class HtmlRenderer {
   /**
    * 预处理HTML内容，转换路径
    * @param html 原始HTML内容
+   * @param sourcePath 当前笔记路径
    * @returns 处理后的HTML内容
    */
-  private preprocessHtmlContent(html: string): string {
+  private preprocessHtmlContent(html: string, sourcePath: string): string {
     // 定义视频、图片和音频文件扩展名
     const mediaExtensions =
-      /\.(jpg|jpeg|png|gif|bmp|webp|svg|mp4|webm|ogg|avi|mov|wmv|flv|mkv|m4v|3gp|mp3|wav|aac|flac|m4a)$/i;
+      /\.(jpg|jpeg|png|gif|bmp|webp|svg|mp4|webm|ogg|avi|mov|wmv|flv|mkv|m4v|3gp|mp3|wav|aac|flac|m4a)(?:[?#].*)?$/i;
 
     // 通用处理：匹配所有HTML标签中的src和poster属性
     // 使用全局替换来处理同一标签中的多个属性
@@ -69,7 +75,7 @@ export class HtmlRenderer {
         // 检查属性值是否以媒体文件扩展名结尾
         if (mediaExtensions.test(attrValue)) {
           const processedValue =
-            this.imagePathProcessor.processImagePath(attrValue);
+            this.imagePathProcessor.processImagePath(attrValue, sourcePath);
           return `${attrName}=${quote}${processedValue}${quote}`;
         }
         // 如果不是媒体文件，返回原始匹配

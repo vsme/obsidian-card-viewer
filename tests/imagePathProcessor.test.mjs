@@ -195,3 +195,25 @@ test("preserves metadata link resolution when the prefix is empty", () => {
     "app://media/cover.jpg"
   );
 });
+
+test("resolves a ./ path relative to the current note", () => {
+  const fixture = createFixture();
+  fixture.addFile("notes/project/cover.jpg");
+  const processor = new ImagePathProcessor(fixture.app);
+
+  assert.equal(
+    processor.processImagePath("./cover.jpg", "notes/project/note.md"),
+    "app://notes/project/cover.jpg"
+  );
+});
+
+test("resolves a ../ path relative to the current note", () => {
+  const fixture = createFixture();
+  fixture.addFile("notes/cover.jpg");
+  const processor = new ImagePathProcessor(fixture.app);
+
+  assert.equal(
+    processor.processImagePath("../cover.jpg", "notes/project/note.md"),
+    "app://notes/cover.jpg"
+  );
+});
