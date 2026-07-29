@@ -77,7 +77,7 @@ export class CardViewerSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('本地图片路径前缀')
-      .setDesc('可选。仅当原路径找不到图片时，在路径前添加此前缀再次查找。例如填写 site，可将 attachments/cover.jpg 映射到 site/attachments/cover.jpg。')
+      .setDesc('可选。仅当 Obsidian 解析和原路径查找均失败时，在路径前添加此前缀再次查找。例如填写 site，可将 attachments/cover.jpg 映射到 site/attachments/cover.jpg。')
       .addText(text => text
         .setPlaceholder('例如：site')
         .setValue(this.plugin.settings.localImagePathPrefix)

@@ -83,7 +83,7 @@ function createFixture() {
   };
 }
 
-test("uses the original vault path when it exists", () => {
+test("preserves successful Obsidian link resolution when a prefix is configured", () => {
   const fixture = createFixture();
   fixture.addFile("attachments/cover.jpg");
   fixture.addFile("site/attachments/cover.jpg");
@@ -97,14 +97,30 @@ test("uses the original vault path when it exists", () => {
       "attachments/cover.jpg",
       "notes/example.md"
     ),
+    "app://other/attachments/cover.jpg"
+  );
+});
+
+test("uses the original vault path before the configured prefix", () => {
+  const fixture = createFixture();
+  fixture.addFile("attachments/cover.jpg");
+  fixture.addFile("site/attachments/cover.jpg");
+  const processor = new ImagePathProcessor(fixture.app, () => ({
+    localImagePathPrefix: "site",
+  }));
+
+  assert.equal(
+    processor.processImagePath(
+      "attachments/cover.jpg",
+      "notes/example.md"
+    ),
     "app://attachments/cover.jpg"
   );
 });
 
-test("falls back to the configured prefix when the original path is missing", () => {
+test("falls back to the configured prefix when existing resolution fails", () => {
   const fixture = createFixture();
   fixture.addFile("site/attachments/cover.jpg");
-  fixture.setLinkDestination(fixture.addFile("other/attachments/cover.jpg"));
   const processor = new ImagePathProcessor(fixture.app, () => ({
     localImagePathPrefix: "site",
   }));

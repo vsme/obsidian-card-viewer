@@ -118,9 +118,9 @@ https://github.com/user-attachments/assets/b0057692-e6a8-45b2-b3e4-3d030ce709dd
 
 ### Local Image Path Prefix
 
-If card data uses paths relative to an exported content root, configure **Local image path prefix** in the plugin settings. For example, setting the prefix to `site` makes `attachments/cover.jpg` fall back to `site/attachments/cover.jpg` when the original path does not exist.
+If card data uses paths relative to an exported content root, configure **Local image path prefix** in the plugin settings. For example, setting the prefix to `site` makes `attachments/cover.jpg` fall back to `site/attachments/cover.jpg` when existing Obsidian resolution and the original path lookup both fail.
 
-The original path is always checked first, and the setting is empty by default, so existing vaults keep their current behavior.
+The prefix is only used as a final fallback, and the setting is empty by default, so existing vaults keep their current behavior.
 
 ### Movie-Specific Fields
 
