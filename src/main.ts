@@ -164,12 +164,12 @@ export default class CardViewerPlugin extends Plugin {
             this.renderOriginalCodeBlock(source, el);
             return;
           }
-          this.renderHtmlBlock(contentAfterMarker, el, ctx.sourcePath);
+          this.renderHtmlBlock(contentAfterMarker, el);
           return;
         }
 
         // 未启用控制时，直接渲染
-        this.renderHtmlBlock(source, el, ctx.sourcePath);
+        this.renderHtmlBlock(source, el);
       } catch (error) {
         this.renderError(
           el,
@@ -197,7 +197,7 @@ export default class CardViewerPlugin extends Plugin {
   /**
    * 渲染HTML代码块
    */
-  private renderHtmlBlock(source: string, el: HTMLElement, sourcePath: string): void {
+  private renderHtmlBlock(source: string, el: HTMLElement): void {
     const trimmedSource = source.trim();
 
     // 创建HTML容器
@@ -208,7 +208,7 @@ export default class CardViewerPlugin extends Plugin {
     if (this.isEmptyHtmlContent(trimmedSource)) {
       this.renderEmptyContent(contentEl);
     } else {
-      this.htmlRenderer.renderHtml(contentEl, trimmedSource, sourcePath);
+      this.htmlRenderer.renderHtml(contentEl, trimmedSource);
     }
   }
 

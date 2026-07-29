@@ -36,7 +36,7 @@ export class ImgsRendererImpl implements ImgsRenderer {
       if (images.length === 0) {
         this.renderEmptyPlaceholder(gridEl);
       } else {
-        this.renderImages(gridEl, images, ctx.sourcePath);
+        this.renderImages(gridEl, images);
       }
     } catch (error) {
       const errorEl = el.appendChild(document.createElement("div"));
@@ -66,18 +66,18 @@ export class ImgsRendererImpl implements ImgsRenderer {
     placeholderEl.textContent = "未找到图片";
   }
 
-  private renderImages(gridEl: HTMLElement, images: ImageData[], sourcePath: string): void {
+  private renderImages(gridEl: HTMLElement, images: ImageData[]): void {
     images.forEach((image, index) => {
-      const imageItem = this.createImageItem(image, index, sourcePath);
+      const imageItem = this.createImageItem(image, index);
       gridEl.appendChild(imageItem);
     });
   }
 
-  private createImageItem(image: ImageData, index: number, sourcePath: string): HTMLElement {
+  private createImageItem(image: ImageData, index: number): HTMLElement {
     const imageItem = document.createElement("div");
     imageItem.className = "card-viewer-imgs-item";
 
-    const imageSrc = this.processImageSrc(image.src, sourcePath);
+    const imageSrc = this.processImageSrc(image.src);
     const imgEl = this.createImageElement(imageItem, imageSrc, image);
 
     // 如果有标题，添加标题显示
@@ -94,8 +94,8 @@ export class ImgsRendererImpl implements ImgsRenderer {
     return imageItem;
   }
 
-  private processImageSrc(src: string, sourcePath: string): string {
-    return this.imagePathProcessor.processImagePath(src, sourcePath);
+  private processImageSrc(src: string): string {
+    return this.imagePathProcessor.processImagePath(src);
   }
 
   private createImageElement(

@@ -50,6 +50,7 @@ export class ImagePathProcessor {
         processedPath.startsWith("data:") || 
         processedPath.startsWith("blob:") || 
         processedPath.startsWith("file:") ||
+        processedPath.startsWith("app:") ||
         processedPath.startsWith("//")) {
       return processedPath;
     }
@@ -64,6 +65,23 @@ export class ImagePathProcessor {
     const hashIndex = cleanPath.indexOf('#');
     if (hashIndex !== -1) {
       cleanPath = cleanPath.substring(0, hashIndex);
+    }
+
+    // 配置前缀后，严格按“原路径 → 前缀路径 → Obsidian 链接解析”的顺序查找。
+    // 显式的 ./ 和 ../ 路径仍保持相对于当前笔记解析，不应用 vault 根目录前缀。
+    const isExplicitRelativePath =
+      cleanPath.startsWith("./") || cleanPath.startsWith("../");
+    const hasConfiguredPrefix =
+      this.getSettings().localImagePathPrefix.trim().length > 0;
+
+    if (hasConfiguredPrefix && !isExplicitRelativePath) {
+      const vaultPath = cleanPath.startsWith("/")
+        ? cleanPath.substring(1)
+        : cleanPath;
+      const exactOrPrefixedResourcePath = this.getVaultResourcePath(vaultPath);
+      if (exactOrPrefixedResourcePath) {
+        return exactOrPrefixedResourcePath;
+      }
     }
 
     // 优先使用 Obsidian 的 metadataCache.getFirstLinkpathDest 来解析路径
