@@ -1,5 +1,5 @@
 import { App, MarkdownPostProcessorContext } from "obsidian";
-import { ImageData, ImgsRenderer } from "../types";
+import { CardViewerSettings, ImageData, ImgsRenderer } from "../types";
 import {
   createImagePathProcessor,
   ImagePathProcessor,
@@ -9,8 +9,8 @@ import { ImageModal } from "../modals/ImageModal";
 export class ImgsRendererImpl implements ImgsRenderer {
   private imagePathProcessor: ImagePathProcessor;
 
-  constructor(private app: App) {
-    this.imagePathProcessor = createImagePathProcessor(app);
+  constructor(private app: App, getSettings: () => CardViewerSettings) {
+    this.imagePathProcessor = createImagePathProcessor(app, getSettings);
   }
 
   async renderImgsGrid(
@@ -36,7 +36,7 @@ export class ImgsRendererImpl implements ImgsRenderer {
       if (images.length === 0) {
         this.renderEmptyPlaceholder(gridEl);
       } else {
-        this.renderImages(gridEl, images);
+        this.renderImages(gridEl, images, ctx.sourcePath);
       }
     } catch (error) {
       const errorEl = el.appendChild(document.createElement("div"));
@@ -66,18 +66,18 @@ export class ImgsRendererImpl implements ImgsRenderer {
     placeholderEl.textContent = "未找到图片";
   }
 
-  private renderImages(gridEl: HTMLElement, images: ImageData[]): void {
+  private renderImages(gridEl: HTMLElement, images: ImageData[], sourcePath: string): void {
     images.forEach((image, index) => {
-      const imageItem = this.createImageItem(image, index);
+      const imageItem = this.createImageItem(image, index, sourcePath);
       gridEl.appendChild(imageItem);
     });
   }
 
-  private createImageItem(image: ImageData, index: number): HTMLElement {
+  private createImageItem(image: ImageData, index: number, sourcePath: string): HTMLElement {
     const imageItem = document.createElement("div");
     imageItem.className = "card-viewer-imgs-item";
 
-    const imageSrc = this.processImageSrc(image.src);
+    const imageSrc = this.processImageSrc(image.src, sourcePath);
     const imgEl = this.createImageElement(imageItem, imageSrc, image);
 
     // 如果有标题，添加标题显示
@@ -94,8 +94,8 @@ export class ImgsRendererImpl implements ImgsRenderer {
     return imageItem;
   }
 
-  private processImageSrc(src: string): string {
-    return this.imagePathProcessor.processImagePath(src);
+  private processImageSrc(src: string, sourcePath: string): string {
+    return this.imagePathProcessor.processImagePath(src, sourcePath);
   }
 
   private createImageElement(
@@ -142,6 +142,9 @@ export class ImgsRendererImpl implements ImgsRenderer {
   }
 }
 
-export const createImgsRenderer = (app: App): ImgsRenderer => {
-  return new ImgsRendererImpl(app);
+export const createImgsRenderer = (
+  app: App,
+  getSettings: () => CardViewerSettings
+): ImgsRenderer => {
+  return new ImgsRendererImpl(app, getSettings);
 };

@@ -76,6 +76,18 @@ export class CardViewerSettingTab extends PluginSettingTab {
     containerEl.createEl('h2', { text: 'Card Viewer 设置' });
 
     new Setting(containerEl)
+      .setName('本地图片路径前缀')
+      .setDesc('可选。仅当原路径找不到图片时，在路径前添加此前缀再次查找。例如填写 site，可将 attachments/cover.jpg 映射到 site/attachments/cover.jpg。')
+      .addText(text => text
+        .setPlaceholder('例如：site')
+        .setValue(this.plugin.settings.localImagePathPrefix)
+        .onChange(async (value) => {
+          this.plugin.settings.localImagePathPrefix = value.trim().replace(/^\/+|\/+$/g, '');
+          await this.plugin.saveSettings();
+          this.plugin.app.workspace?.trigger('layout-change');
+        }));
+
+    new Setting(containerEl)
       .setName('海报图片 Alt 文本模式')
       .setDesc('选择海报图片的 alt 属性内容模式。选择"空"可以解决部分主题下未加载时的边框问题。')
       .addDropdown(dropdown => dropdown

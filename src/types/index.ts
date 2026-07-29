@@ -52,10 +52,12 @@ export interface CardViewerSettings {
   enableHtmlParsing: boolean;
   requireHtmlPreviewMarker: boolean;
   posterAltMode: "empty" | "title";
+  localImagePathPrefix: string;
 }
 
 export const DEFAULT_SETTINGS: CardViewerSettings = {
   enableHtmlParsing: true,
   requireHtmlPreviewMarker: false,
   posterAltMode: "title",
+  localImagePathPrefix: "",
 };

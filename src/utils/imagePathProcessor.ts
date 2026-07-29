@@ -1,10 +1,20 @@
-import { App, TFile } from 'obsidian';
+import { App, normalizePath, TFile } from 'obsidian';
+import { CardViewerSettings } from '../types';
+
+type ImagePathSettings = Pick<CardViewerSettings, 'localImagePathPrefix'>;
+
+const DEFAULT_IMAGE_PATH_SETTINGS: ImagePathSettings = {
+  localImagePathPrefix: '',
+};
 
 /**
  * 通用图片路径处理工具类
  */
 export class ImagePathProcessor {
-  constructor(private app: App) {}
+  constructor(
+    private app: App,
+    private getSettings: () => ImagePathSettings = () => DEFAULT_IMAGE_PATH_SETTINGS
+  ) {}
 
   /**
    * 通用图片路径处理算法 - 遵循 Obsidian 最佳实践
@@ -93,7 +103,7 @@ export class ImagePathProcessor {
         // 如果无法获取源路径，则简单地移除前缀
         resolvedPath = cleanPath.replace(/^(\.\/|\.\.\/)+/, '');
       }
-      return this.getVaultResourcePath(resolvedPath) || imagePath;
+      return this.getVaultResourcePath(resolvedPath, false) || imagePath;
     }
     // 处理以单个 / 开头的绝对路径（从 vault 根目录查找）
     else if (cleanPath.startsWith("/") && !cleanPath.startsWith("//")) {
@@ -114,15 +124,37 @@ export class ImagePathProcessor {
    * 使用 Obsidian 推荐的 Vault API 而非 Adapter API
    * 确保跨平台兼容性（桌面端和移动端）
    */
-  private getVaultResourcePath(path: string): string | null {
+  private getVaultResourcePath(path: string, useConfiguredPrefix: boolean = true): string | null {
     try {
-      const file = this.app.vault.getAbstractFileByPath(path);
-      if (file instanceof TFile) {
-        // 使用 Vault API 获取资源路径，这是推荐的做法
-        return this.app.vault.getResourcePath(file);
+      const normalizedPath = normalizePath(path);
+      const directResourcePath = this.getResourcePathForFile(normalizedPath);
+      if (directResourcePath) {
+        return directResourcePath;
+      }
+
+      if (useConfiguredPrefix) {
+        const prefix = this.getSettings().localImagePathPrefix.trim();
+        if (prefix) {
+          const normalizedPrefix = normalizePath(prefix).replace(/^\/+|\/+$/g, '');
+          const pathWithoutLeadingSlash = normalizedPath.replace(/^\/+/, '');
+          const prefixedPath = normalizePath(`${normalizedPrefix}/${pathWithoutLeadingSlash}`);
+
+          if (prefixedPath !== normalizedPath) {
+            return this.getResourcePathForFile(prefixedPath);
+          }
+        }
       }
     } catch (error) {
       console.warn(`Failed to get resource path for: ${path}`, error);
+    }
+    return null;
+  }
+
+  private getResourcePathForFile(path: string): string | null {
+    const file = this.app.vault.getAbstractFileByPath(path);
+    if (file instanceof TFile) {
+      // 使用 Vault API 获取资源路径，这是推荐的做法
+      return this.app.vault.getResourcePath(file);
     }
     return null;
   }
@@ -131,8 +163,12 @@ export class ImagePathProcessor {
 /**
  * 创建图片路径处理器实例的工厂函数
  * @param app Obsidian App 实例
+ * @param getSettings 获取图片路径设置
  * @returns ImagePathProcessor 实例
  */
-export function createImagePathProcessor(app: App): ImagePathProcessor {
-  return new ImagePathProcessor(app);
+export function createImagePathProcessor(
+  app: App,
+  getSettings?: () => ImagePathSettings
+): ImagePathProcessor {
+  return new ImagePathProcessor(app, getSettings);
 }

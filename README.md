@@ -116,6 +116,12 @@ https://github.com/user-attachments/assets/b0057692-e6a8-45b2-b3e4-3d030ce709dd
 - `overview`: Synopsis
 - `poster`: Poster/cover image path
 
+### Local Image Path Prefix
+
+If card data uses paths relative to an exported content root, configure **Local image path prefix** in the plugin settings. For example, setting the prefix to `site` makes `attachments/cover.jpg` fall back to `site/attachments/cover.jpg` when the original path does not exist.
+
+The original path is always checked first, and the setting is empty by default, so existing vaults keep their current behavior.
+
 ### Movie-Specific Fields
 
 - `runtime`: Duration (in minutes, can include unit like "122 minutes")

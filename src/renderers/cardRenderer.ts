@@ -1,5 +1,5 @@
 import { App, MarkdownPostProcessorContext, setIcon, Keymap } from "obsidian";
-import { CardData, CardRenderer } from "../types";
+import { CardData, CardRenderer, CardViewerSettings } from "../types";
 import { cardParser } from "../parsers/cardParser";
 import {
   createImagePathProcessor,
@@ -9,8 +9,8 @@ import {
 export class CardRendererImpl implements CardRenderer {
   private imagePathProcessor: ImagePathProcessor;
 
-  constructor(private app: App, private getSettings: () => { posterAltMode: "empty" | "title" }) {
-    this.imagePathProcessor = createImagePathProcessor(app);
+  constructor(private app: App, private getSettings: () => CardViewerSettings) {
+    this.imagePathProcessor = createImagePathProcessor(app, getSettings);
   }
 
   async renderCard(
@@ -205,7 +205,7 @@ export class CardRendererImpl implements CardRenderer {
 
       // 图片加载处理
       posterEl.onerror = () => {
-        posterEl.addClass("card-viewer-poster-image hidden");
+        posterEl.addClass("hidden");
         const errorEl = posterContainer.createEl("div", {
           cls: "card-viewer-poster-error",
         });
@@ -295,6 +295,6 @@ export class CardRendererImpl implements CardRenderer {
   }
 }
 
-export const createCardRenderer = (app: App, getSettings: () => { posterAltMode: "empty" | "title" }): CardRenderer => {
+export const createCardRenderer = (app: App, getSettings: () => CardViewerSettings): CardRenderer => {
   return new CardRendererImpl(app, getSettings);
 };

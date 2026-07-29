@@ -115,6 +115,12 @@ https://github.com/user-attachments/assets/b0057692-e6a8-45b2-b3e4-3d030ce709dd
 - `overview`: 简介
 - `poster`: 海报/封面图片路径
 
+### 本地图片路径前缀
+
+如果卡片数据使用的是相对于导出内容根目录的路径，可以在插件设置中填写“本地图片路径前缀”。例如填写 `site` 后，当 `attachments/cover.jpg` 不存在时，插件会继续尝试 `site/attachments/cover.jpg`。
+
+插件始终优先检查原路径，并且该配置默认留空，因此不会改变现有 Vault 的行为。
+
 ### 电影特有字段
 
 - `runtime`: 时长（分钟，也可带单位如"122分钟"）
